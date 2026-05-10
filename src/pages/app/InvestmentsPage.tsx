@@ -1,14 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { BarChart3, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useAuth } from '@/features/auth/AuthProvider'
 import { formatUsd } from '@/features/investments/calculator'
 import { cancelPendingInvestment, getInvestments } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { userFacingErrorMessage } from '@/lib/uiCopy'
 import { useToastStore } from '@/stores/toastStore'
 
 export function InvestmentsPage() {
@@ -16,6 +19,7 @@ export function InvestmentsPage() {
   const qc = useQueryClient()
   const { user } = useAuth()
   const userId = user?.id ?? ''
+  const [cancelId, setCancelId] = useState<string | null>(null)
 
   const q = useQuery({
     queryKey: ['investments', userId],
@@ -28,6 +32,7 @@ export function InvestmentsPage() {
   const cancelM = useMutation({
     mutationFn: (investmentId: string) => cancelPendingInvestment({ investmentId }),
     onSuccess: async () => {
+      setCancelId(null)
       await Promise.all([
         qc.invalidateQueries({ queryKey: ['investments', userId] }),
         qc.invalidateQueries({ queryKey: ['admin', 'pending-investments'] }),
@@ -35,27 +40,34 @@ export function InvestmentsPage() {
       toast({ tone: 'success', title: 'Request cancelled', message: 'Your pending investment request was withdrawn.' })
     },
     onError: (err) => {
-      const msg = err instanceof Error ? err.message : 'Unable to cancel'
-      toast({ tone: 'danger', title: 'Cancel failed', message: msg })
+      setCancelId(null)
+      toast({ tone: 'danger', title: 'Cancel failed', message: userFacingErrorMessage(err) })
     },
   })
 
-  function confirmCancel(investmentId: string) {
-    if (
-      !window.confirm(
-        'Cancel this investment request? You can create a new one later from Investment Plans. This only applies before the request is approved.',
-      )
-    ) {
-      return
-    }
-    cancelM.mutate(investmentId)
+  function runCancel() {
+    if (!cancelId) return
+    cancelM.mutate(cancelId)
   }
 
   return (
     <div>
+      <ConfirmDialog
+        open={Boolean(cancelId)}
+        onClose={() => {
+          if (cancelM.isPending) return
+          setCancelId(null)
+        }}
+        title="Cancel this request?"
+        description="You can start a new request later from Investment Plans. This only applies while the request is still pending approval."
+        cancelLabel="Keep request"
+        confirmLabel="Cancel request"
+        pending={cancelM.isPending}
+        onConfirm={runCancel}
+      />
       <PageHeader
         title="Investments"
-        subtitle="Track status, projected returns, and investment history."
+        subtitle="Track status, plan returns, and investment history."
         right={
           <Link to="/app/plans" className="hidden sm:block">
             <div className="inline-flex items-center gap-2 rounded-2xl bg-white/6 px-4 py-2 text-sm font-semibold text-white/80 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white">
@@ -114,7 +126,7 @@ export function InvestmentsPage() {
                         size="sm"
                         className="text-white/70 hover:text-white"
                         disabled={cancelM.isPending || !isSupabaseConfigured}
-                        onClick={() => confirmCancel(i.id)}
+                        onClick={() => setCancelId(i.id)}
                       >
                         {cancelM.isPending ? 'Cancelling…' : 'Cancel request'}
                       </Button>
@@ -128,7 +140,7 @@ export function InvestmentsPage() {
                     <div className="mt-1 text-sm font-semibold text-white/85">{formatUsd(i.amountUsd)}</div>
                   </div>
                   <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                    <div className="text-xs text-white/55">Projected return</div>
+                    <div className="text-xs text-white/55">Plan return</div>
                     <div className="mt-1 text-sm font-semibold text-white/85">{formatUsd(i.projectedReturnUsd)}</div>
                   </div>
                   <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
@@ -141,7 +153,7 @@ export function InvestmentsPage() {
                 </div>
 
                 <div className="mt-4 text-xs text-white/55">
-                  Investments involve risk. Returns are estimates and not guaranteed. Activation occurs after your request is confirmed.
+                  Returns are guaranteed per your plan’s terms. Activation occurs after your request is confirmed.
                   {i.status === 'pending'
                     ? ' You may cancel a pending request before it is approved (for example, if you have not completed payment yet).'
                     : null}

@@ -41,8 +41,8 @@ export function HomePage() {
               transition={{ duration: 0.26, delay: 0.1 }}
               className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/70 sm:text-lg"
             >
-              Premium access to gold-backed opportunities with a compliance-first onboarding experience, manual payment
-              verification, and professional investor reporting.
+              Premium access to gold-backed opportunities with a compliance-first onboarding experience, payment
+              confirmation by our team, and professional investor reporting.
             </motion.p>
 
             <motion.div
@@ -88,16 +88,19 @@ export function HomePage() {
                 </div>
                 <div className="mt-3 text-sm leading-relaxed text-white/70">
                   Aurum Investment focuses on African gold-backed opportunities with careful disclosures,
-                  manual payment verification, and KYC/AML-aligned onboarding. We prioritize transparency, auditability,
-                  and investor-grade reporting.
+                  payment confirmation aligned with compliance standards, and KYC/AML-aligned onboarding. We prioritize
+                  transparency, auditability, and investor-grade reporting.
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 {[
-                  { k: 'Manual verification', v: 'All payments are reviewed by support/admin before activation.' },
+                  {
+                    k: 'Payment confirmation',
+                    v: 'Deposits are reviewed and confirmed by our team before they are applied to your account.',
+                  },
                   { k: 'KYC required', v: 'KYC helps protect withdrawals and fraud prevention workflows.' },
                   { k: 'Transparent reporting', v: 'Investment history, receipts, and activity logs for clarity.' },
-                  { k: 'Risk disclosure', v: 'Projected ROI is shown as estimates and not guaranteed.' },
+                  { k: 'Risk disclosure', v: 'ROI figures reflect each plan’s guaranteed return structure in its published terms.' },
                 ].map((i) => (
                   <div key={i.k} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
                     <div className="text-sm font-semibold text-white/85">{i.k}</div>
@@ -130,7 +133,7 @@ export function HomePage() {
                 </div>
                 <div className="mt-3 text-sm leading-relaxed text-white/70">
                   Aurum Investment is built to look and behave like an enterprise fintech platform, with
-                  clear disclosures, manual checks, and investor reporting. Avoid unrealistic wording and always
+                  clear disclosures, compliance checks, and investor reporting. Avoid unrealistic wording and always
                   confirm details with the compliance team before publishing.
                 </div>
                 <div className="mt-5 flex flex-col gap-3 sm:flex-row">

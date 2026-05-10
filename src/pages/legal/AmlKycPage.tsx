@@ -19,7 +19,7 @@ export function AmlKycPage() {
               </div>
               <div className="mt-5 font-semibold text-white/90">AML screening</div>
               <div className="mt-2 leading-relaxed">
-                We may screen users and transactions to detect suspicious activity. Manual payment verification supports
+                We may screen users and transactions to detect suspicious activity. Payment confirmation supports
                 reconciliation and compliance checks.
               </div>
               <div className="mt-5 font-semibold text-white/90">Source of funds</div>

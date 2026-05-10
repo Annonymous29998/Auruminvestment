@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { userFacingErrorMessage } from '@/lib/uiCopy'
 
 export type ToastTone = 'neutral' | 'success' | 'warning' | 'danger'
 
@@ -24,10 +25,13 @@ function uid() {
 export const useToastStore = create<ToastState>((set) => ({
   items: [],
   /** Replaces any visible toast so only one shows at a time (no stacking). */
-  push: (item) =>
-    set(() => ({
-      items: [{ ...item, id: uid(), createdAt: Date.now() }],
-    })),
+  push: (item) => {
+    const message =
+      item.tone === 'danger' && item.message ? userFacingErrorMessage(item.message) : item.message
+    return set(() => ({
+      items: [{ ...item, message, id: uid(), createdAt: Date.now() }],
+    }))
+  },
   remove: (id) => set((s) => ({ items: s.items.filter((t) => t.id !== id) })),
   clear: () => set({ items: [] }),
 }))

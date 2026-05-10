@@ -6,7 +6,7 @@ const items = [
     name: 'Amina K.',
     role: 'Portfolio Analyst',
     quote:
-      'The dashboard is clean and the compliance flow is clear. I appreciate the manual verification and the transparent risk disclosures.',
+      'The dashboard is clean and the compliance flow is clear. I appreciate the clear payment confirmation process and the transparent risk disclosures.',
   },
   {
     name: 'Kwame A.',
@@ -18,7 +18,7 @@ const items = [
     name: 'Lerato S.',
     role: 'Investor',
     quote:
-      'I like seeing projected ROI and the investment timeline. The KYC checklist made onboarding straightforward.',
+      'I like seeing the stated ROI and the investment timeline. The KYC checklist made onboarding straightforward.',
   },
 ]
 

@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { adminListPendingKycDocuments, adminSetUserKycStatus } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { getSupabase } from '@/lib/supabaseClient'
 import { useToastStore } from '@/stores/toastStore'
 
@@ -66,12 +67,12 @@ export function AdminKycPage() {
 
   return (
     <div>
-      <PageHeader title="KYC Review" subtitle="Review KYC uploads and approve or reject manually." />
+      <PageHeader title="KYC Review" subtitle="Review KYC uploads and approve or reject." />
       {!isSupabaseConfigured ? (
         <EmptyState
           icon={<FileCheck2 className="h-5 w-5 text-gold" />}
-          title="Supabase required"
-          description="Configure Supabase Storage and Database to review KYC uploads."
+          title={uiCopy.emptyStateBackendTitle}
+          description="File storage and the database must be connected before you can review KYC uploads."
         />
       ) : q.isLoading ? (
         <div className="space-y-3">

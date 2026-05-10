@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { formatUsd } from '@/features/investments/calculator'
 import { isSupabaseConfigured } from '@/lib/env'
 import { adminGetOverviewMetrics } from '@/lib/api'
+import { uiCopy, userFacingErrorMessage } from '@/lib/uiCopy'
 
 export function AdminOverviewPage() {
   const q = useQuery({
@@ -23,13 +24,13 @@ export function AdminOverviewPage() {
 
       {!isSupabaseConfigured ? (
         <div className="rounded-3xl aurum-glass ring-1 ring-white/10 p-6 text-sm text-white/70">
-          Supabase is not configured. Connect Supabase to enable admin operations (users, approvals, proofs, analytics).
+          {uiCopy.emptyStateBackendDescription}
         </div>
       ) : q.isError ? (
         <EmptyState
           icon={<Activity className="h-5 w-5 text-gold" />}
           title="Unable to load admin metrics"
-          description={q.error instanceof Error ? q.error.message : 'Check your Supabase admin access policies.'}
+          description={userFacingErrorMessage(q.error)}
         />
       ) : null}
 
@@ -51,7 +52,7 @@ export function AdminOverviewPage() {
           </CardHeader>
           <CardContent className="pt-4">
             <div className="text-2xl font-semibold text-white/90">{q.data?.pendingProofsCount ?? '—'}</div>
-            <div className="mt-2 text-xs text-white/55">Waiting for manual review.</div>
+            <div className="mt-2 text-xs text-white/55">Waiting for review.</div>
           </CardContent>
         </Card>
         <Card className="ring-1 ring-white/10">

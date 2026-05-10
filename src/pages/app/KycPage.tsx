@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Label } from '@/components/ui/Label'
 import { Select } from '@/components/ui/Select'
 import { env, isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { createKycDocument, markOwnKycPending } from '@/lib/api'
 import { uploadToBucket } from '@/lib/storage'
 import { useAuth } from '@/features/auth/AuthProvider'
@@ -36,8 +37,8 @@ export function KycPage() {
     if (!isSupabaseConfigured) {
       toast({
         tone: 'warning',
-        title: 'Configuration required',
-        message: 'Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.',
+        title: uiCopy.toastBackendTitle,
+        message: uiCopy.toastBackendMessage,
       })
       return
     }
@@ -107,7 +108,8 @@ export function KycPage() {
               </div>
               {!isSupabaseConfigured ? (
                 <div className="text-xs text-white/55">
-                  Supabase is required to upload KYC documents. Configure your environment variables and refresh.
+                  Document upload is unavailable until the app is fully connected. Ask your administrator to finish
+                  setup, then refresh.
                 </div>
               ) : null}
             </div>

@@ -19,6 +19,7 @@ import {
   type AdminInvestmentPlan,
 } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { useToastStore } from '@/stores/toastStore'
 
 export function AdminPlansPage() {
@@ -148,8 +149,8 @@ export function AdminPlansPage() {
       {!isSupabaseConfigured ? (
         <EmptyState
           icon={<Gem className="h-5 w-5 text-gold" />}
-          title="Supabase required"
-          description="Configure Supabase to enable plan management."
+          title={uiCopy.emptyStateBackendTitle}
+          description={uiCopy.emptyStateBackendDescription}
         />
       ) : (
         <Card className="ring-1 ring-white/10">

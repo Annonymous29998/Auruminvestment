@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from 'react'
 import { isSupabaseConfigured } from '@/lib/env'
 import { getSupabase } from '@/lib/supabaseClient'
+import { ERR_BACKEND_NOT_CONFIGURED, uiCopy } from '@/lib/uiCopy'
 import type { AppUser, UserRole } from '@/features/auth/authTypes'
 import { useToastStore } from '@/stores/toastStore'
 
@@ -12,7 +13,7 @@ type AuthContextValue = {
   loading: boolean
   /** Refetch role / KYC / name from public.users (e.g. after admin updates your profile). */
   refreshProfile: () => Promise<void>
-  signUp: (args: { email: string; password: string; fullName?: string }) => Promise<void>
+  signUp: (args: { email: string; password: string; fullName?: string }) => Promise<{ hasSession: boolean }>
   signIn: (args: { email: string; password: string }) => Promise<void>
   signOut: () => Promise<void>
   requestPasswordReset: (email: string) => Promise<void>
@@ -92,8 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const t = window.setTimeout(() => {
         useToastStore.getState().push({
           tone: 'warning',
-          title: 'Configuration required',
-          message: 'Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.',
+          title: uiCopy.toastBackendTitle,
+          message: uiCopy.toastBackendMessage,
         })
       }, 0)
       return () => window.clearTimeout(t)
@@ -186,7 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
       refreshProfile,
       signUp: async ({ email, password, fullName }) => {
-        if (!isSupabaseConfigured) throw new Error('Supabase is not configured')
+        if (!isSupabaseConfigured) throw new Error(ERR_BACKEND_NOT_CONFIGURED)
         const supabase = getSupabase()
         const { data: signUpData, error } = await supabase.auth.signUp({
           email,
@@ -197,6 +198,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         if (error) throw error
         const signedUser = signUpData.user
+        const hasSession = Boolean(signUpData.session)
         // With email confirmation off, you get a session immediately — upsert profile for admin list.
         // With confirmation on, session is null until verify; the DB trigger (see supabase SQL) must create public.users.
         if (signedUser && signUpData.session) {
@@ -210,14 +212,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             /* trigger may have inserted; ignore */
           }
         }
-        toast({
-          tone: 'neutral',
-          title: 'Verify your email',
-          message: 'Check your inbox to verify your email before signing in.',
-        })
+        return { hasSession }
       },
       signIn: async ({ email, password }) => {
-        if (!isSupabaseConfigured) throw new Error('Supabase is not configured')
+        if (!isSupabaseConfigured) throw new Error(ERR_BACKEND_NOT_CONFIGURED)
         const supabase = getSupabase()
         const { data, error } = await withTimeout(
           supabase.auth.signInWithPassword({ email, password }),
@@ -275,7 +273,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .catch(() => {})
       },
       signOut: async () => {
-        if (!isSupabaseConfigured) throw new Error('Supabase is not configured')
+        if (!isSupabaseConfigured) throw new Error(ERR_BACKEND_NOT_CONFIGURED)
         const supabase = getSupabase()
         setSession(null)
         setUser(null)
@@ -288,7 +286,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       },
       requestPasswordReset: async (email) => {
-        if (!isSupabaseConfigured) throw new Error('Supabase is not configured')
+        if (!isSupabaseConfigured) throw new Error(ERR_BACKEND_NOT_CONFIGURED)
         const supabase = getSupabase()
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/auth/reset-password`,
@@ -297,7 +295,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         toast({ tone: 'neutral', title: 'Reset email sent', message: 'Check your inbox to continue.' })
       },
       updatePassword: async (newPassword) => {
-        if (!isSupabaseConfigured) throw new Error('Supabase is not configured')
+        if (!isSupabaseConfigured) throw new Error(ERR_BACKEND_NOT_CONFIGURED)
         const supabase = getSupabase()
         const { error } = await supabase.auth.updateUser({ password: newPassword })
         if (error) throw error

@@ -10,10 +10,23 @@ export type ModalProps = {
   title?: string
   description?: string
   children: ReactNode
+  /** Panel (inner card) classes. */
   className?: string
+  /** Outer fixed layer; use a higher z-index for alerts above nav/toasts. */
+  overlayStackClassName?: string
+  showCloseButton?: boolean
 }
 
-export function Modal({ open, onClose, title, description, children, className }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  description,
+  children,
+  className,
+  overlayStackClassName,
+  showCloseButton = true,
+}: ModalProps) {
   useEffect(() => {
     if (!open) return
     const prev = document.body.style.overflow
@@ -27,7 +40,10 @@ export function Modal({ open, onClose, title, description, children, className }
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-80 flex items-center justify-center p-4 sm:p-6"
+          className={cn(
+            'fixed inset-0 z-80 flex items-center justify-center p-4 sm:p-6',
+            overlayStackClassName,
+          )}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -60,14 +76,16 @@ export function Modal({ open, onClose, title, description, children, className }
                 ) : null}
                 {description ? <div className="mt-1 text-sm text-white/65">{description}</div> : null}
               </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              {showCloseButton ? (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              ) : null}
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-6">{children}</div>
           </motion.div>

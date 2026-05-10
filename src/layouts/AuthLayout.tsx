@@ -22,7 +22,7 @@ export function AuthLayout() {
               Aurum Investment
             </div>
             <div className="mt-1 text-sm text-white/65">
-              Gold-backed opportunities with manual verification and compliance-first onboarding.
+              Gold-backed opportunities with compliance-first onboarding and payment confirmation by our team.
             </div>
           </div>
           <div className="px-6 py-6">
@@ -30,7 +30,7 @@ export function AuthLayout() {
           </div>
         </motion.div>
         <div className="mx-auto mt-6 max-w-md text-xs text-white/55">
-          Investments involve risk. KYC verification is required before withdrawals.
+          Returns are defined by each plan’s terms. KYC verification is required before withdrawals.
         </div>
       </div>
     </div>

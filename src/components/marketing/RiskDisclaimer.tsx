@@ -15,13 +15,13 @@ export function RiskDisclaimer() {
                   Risk Disclosure
                 </div>
                 <div className="mt-2 max-w-3xl text-sm leading-relaxed text-white/70">
-                  Commodity and gold-backed participation involves risk, including price volatility, liquidity
-                  constraints, operational factors, and regulatory changes. Returns shown on this platform are
-                  estimates and projections and are not guaranteed.
+                  Gold-backed participation can still involve operational timing, liquidity windows, and regulatory
+                  change. Returns are guaranteed under each investment plan’s published terms; figures on the platform
+                  reflect those terms and may be updated when plan documentation changes.
                 </div>
                 <div className="mt-3 text-sm text-white/65">
                   Users must complete KYC verification. Aurum Investment operates AML compliance checks and
-                  manually verifies payments for fraud prevention and auditability.
+                  confirms payments for fraud prevention and auditability.
                 </div>
               </div>
             </div>

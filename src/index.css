@@ -103,4 +103,30 @@ body {
   .aurum-border {
     border-color: var(--border);
   }
+
+  /** Seamless horizontal ticker: duplicated row, translate -50%. */
+  .aurum-gold-marquee-mask {
+    overflow: hidden;
+    width: 100%;
+    mask-image: linear-gradient(90deg, transparent, #000 2%, #000 98%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 2%, #000 98%, transparent);
+  }
+
+  .aurum-gold-marquee-track {
+    width: max-content;
+    animation: aurum-gold-marquee 42s linear infinite;
+  }
+
+  .aurum-gold-marquee-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes aurum-gold-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
 }

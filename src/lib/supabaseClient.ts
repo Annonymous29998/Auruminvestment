@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { env, isSupabaseConfigured } from '@/lib/env'
+import { ERR_BACKEND_NOT_CONFIGURED } from '@/lib/uiCopy'
 
 let client: SupabaseClient | null = null
 
@@ -40,7 +41,7 @@ function migrateLegacyAdminSession(ref: string) {
  */
 export function getSupabase(): SupabaseClient {
   if (!isSupabaseConfigured) {
-    throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
+    throw new Error(ERR_BACKEND_NOT_CONFIGURED)
   }
 
   if (!client) {

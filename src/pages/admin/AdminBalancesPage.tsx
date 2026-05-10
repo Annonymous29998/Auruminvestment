@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { formatUsd } from '@/features/investments/calculator'
 import { adminAdjustUserBalance, adminListUsers } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { useToastStore } from '@/stores/toastStore'
 
 type RowDraft = { newTotal: string; deduct: string }
@@ -68,7 +69,7 @@ export function AdminBalancesPage() {
 
   function applySet(userId: string) {
     if (!isSupabaseConfigured) {
-      toast({ tone: 'warning', title: 'Supabase required', message: 'Configure Supabase to update balances.' })
+      toast({ tone: 'warning', title: uiCopy.toastBackendTitle, message: uiCopy.toastBackendMessage })
       return
     }
     const v = parseUsd(draftFor(userId).newTotal)
@@ -81,7 +82,7 @@ export function AdminBalancesPage() {
 
   function applyRemove(userId: string, currentUsd: number) {
     if (!isSupabaseConfigured) {
-      toast({ tone: 'warning', title: 'Supabase required', message: 'Configure Supabase to update balances.' })
+      toast({ tone: 'warning', title: uiCopy.toastBackendTitle, message: uiCopy.toastBackendMessage })
       return
     }
     const amt = parseUsd(draftFor(userId).deduct)
@@ -105,8 +106,8 @@ export function AdminBalancesPage() {
       {!isSupabaseConfigured ? (
         <EmptyState
           icon={<Wallet className="h-5 w-5 text-gold" />}
-          title="Supabase required"
-          description="Configure Supabase to load users and balances."
+          title={uiCopy.emptyStateBackendTitle}
+          description={uiCopy.emptyStateBackendDescription}
         />
       ) : usersQ.isLoading ? (
         <div className="space-y-3">

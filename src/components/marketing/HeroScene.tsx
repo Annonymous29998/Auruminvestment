@@ -89,9 +89,9 @@ export function HeroScene() {
                 icon={<Users className="h-5 w-5 text-gold" />}
               />
               <StatCard
-                title="Projected ROI"
-                value="Estimated returns"
-                sub="No guaranteed profits"
+                title="Plan ROI"
+                value="Stated returns"
+                sub="Guaranteed per plan terms"
                 icon={<TrendingUp className="h-5 w-5 text-gold" />}
               />
             </div>
@@ -169,9 +169,9 @@ export function HeroScene() {
                 className="right-3 top-6 w-[230px] sm:right-8 sm:top-14"
               />
               <FloatingCard
-                title="Projected ROI"
-                value="Estimated returns"
-                sub="No guaranteed profits"
+                title="Plan ROI"
+                value="Stated returns"
+                sub="Guaranteed per plan terms"
                 icon={<TrendingUp className="h-5 w-5 text-gold" />}
                 className="bottom-3 right-4 w-[240px] sm:bottom-8 sm:right-10"
               />

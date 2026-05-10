@@ -61,7 +61,8 @@ export function LoginPage() {
         toast({
           tone: 'danger',
           title: 'Admin access required',
-          message: 'Admin role not detected for this account. Ensure users.role is set to admin in Supabase.',
+          message:
+            'This account does not have administrator access. Sign in with an admin account, or ask your platform owner to grant access.',
         })
         navigate('/app', { replace: true })
         return

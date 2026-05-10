@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/Label'
 import { Select } from '@/components/ui/Select'
 import { createPaymentProof, getPaymentDisplaySettings, mergePaymentDisplayWithEnv } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { uploadToBucket } from '@/lib/storage'
 import { useToastStore } from '@/stores/toastStore'
 import type { PaymentMethod } from '@/types/domain'
@@ -88,8 +89,8 @@ export function CryptoPaymentPanel({
     if (!isSupabaseConfigured) {
       toast({
         tone: 'warning',
-        title: 'Configuration required',
-        message: 'Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.',
+        title: uiCopy.toastBackendTitle,
+        message: uiCopy.toastBackendMessage,
       })
       return
     }
@@ -260,7 +261,8 @@ export function CryptoPaymentPanel({
 
         {!isSupabaseConfigured ? (
           <div className="mt-5 rounded-2xl bg-white/5 p-4 text-sm text-white/70 ring-1 ring-white/10">
-            Supabase is required to submit proofs. Please configure your environment variables and refresh.
+            Payment proofs cannot be submitted until the app is fully connected. Ask your administrator to finish setup,
+            then refresh.
           </div>
         ) : null}
 

@@ -37,14 +37,13 @@ export function GoldChart({ height = 160 }: { height?: number }) {
     refetchInterval: 1000 * 60 * 30,
   })
 
-  const { series, latest, changePct, meta } = useMemo(() => {
+  const { series, latest, changePct } = useMemo(() => {
     const points = (q.data ?? []).slice(-60)
     const series = points.map((p) => p.price)
     const latest = series.at(-1) ?? null
     const first = series.at(0) ?? null
     const changePct = latest != null && first != null ? ((latest - first) / first) * 100 : null
-    const meta = points.at(-1)?.source ?? null
-    return { series, latest, changePct, meta }
+    return { series, latest, changePct }
   }, [q.data])
 
   const d = useMemo(() => toPath(series, w, h), [series, w, h])
@@ -79,7 +78,6 @@ export function GoldChart({ height = 160 }: { height?: number }) {
                 {changePct == null ? '—' : `${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%`}
               </span>
             </div>
-            {meta ? <span className="hidden sm:inline">Source: {meta}</span> : null}
           </div>
         </div>
 

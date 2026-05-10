@@ -19,13 +19,14 @@ export function TermsPage() {
               </div>
               <div className="mt-5 font-semibold text-white/90">2. Risk</div>
               <div className="mt-2 leading-relaxed">
-                Investments involve risk, including loss of capital. Any projected ROI is an estimate and may vary
-                based on market and operational factors.
+                Each investment plan sets out guaranteed returns and schedules in its terms. Operational, compliance,
+                or administrative factors may affect timing of crediting or access, but not the return amounts defined
+                in your enrolled plan, except where plan terms expressly allow adjustment.
               </div>
               <div className="mt-5 font-semibold text-white/90">3. Verification</div>
               <div className="mt-2 leading-relaxed">
-                Users must complete KYC verification and AML screening as required. Payments may be verified manually
-                before activation of investments.
+                Users must complete KYC verification and AML screening as required. Payments may be confirmed by our
+                team before activation of investments.
               </div>
               <div className="mt-5 font-semibold text-white/90">4. Withdrawals</div>
               <div className="mt-2 leading-relaxed">

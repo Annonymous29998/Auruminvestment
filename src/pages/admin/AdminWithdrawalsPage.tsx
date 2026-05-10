@@ -14,6 +14,7 @@ import {
   adminRejectWithdrawal,
 } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { useToastStore } from '@/stores/toastStore'
 
 export function AdminWithdrawalsPage() {
@@ -68,8 +69,8 @@ export function AdminWithdrawalsPage() {
       {!isSupabaseConfigured ? (
         <EmptyState
           icon={<Wallet className="h-5 w-5 text-gold" />}
-          title="Supabase required"
-          description="Configure Supabase to load withdrawal requests."
+          title={uiCopy.emptyStateBackendTitle}
+          description={uiCopy.emptyStateBackendDescription}
         />
       ) : (
         <Card className="ring-1 ring-white/10">

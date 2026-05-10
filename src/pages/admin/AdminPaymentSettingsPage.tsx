@@ -14,6 +14,7 @@ import {
   mergePaymentDisplayWithEnv,
 } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { useToastStore } from '@/stores/toastStore'
 
 function emptyForm(): PaymentDisplaySettings {
@@ -54,7 +55,7 @@ export function AdminPaymentSettingsPage() {
   function submit(e: FormEvent) {
     e.preventDefault()
     if (!isSupabaseConfigured) {
-      toast({ tone: 'warning', title: 'Supabase required', message: 'Configure Supabase before saving.' })
+      toast({ tone: 'warning', title: uiCopy.toastBackendTitle, message: uiCopy.toastBackendMessage })
       return
     }
     saveM.mutate()
@@ -64,7 +65,7 @@ export function AdminPaymentSettingsPage() {
     <div>
       <PageHeader
         title="Payment methods"
-        subtitle="Bank transfer and crypto addresses shown to investors. Empty fields fall back to Vite env defaults."
+        subtitle="Bank and crypto details, homepage support card copy, and contact links (WhatsApp, Telegram, email). Empty fields fall back to deployment defaults."
       />
 
       <Card className="ring-1 ring-white/10">
@@ -75,12 +76,67 @@ export function AdminPaymentSettingsPage() {
         <CardContent className="pt-6">
           {q.isError ? (
             <div className="mb-4 rounded-2xl bg-white/5 p-4 text-sm text-amber-200/90 ring-1 ring-white/10">
-              Could not load saved settings. If the table is missing, run{' '}
-              <code className="rounded bg-black/30 px-1.5 py-0.5 text-xs">supabase/payment_display_settings.sql</code>{' '}
-              in the Supabase SQL editor, then refresh.
+              Could not load saved payment settings. Your developer may need to apply the latest database update from
+              the project, then refresh this page.
             </div>
           ) : null}
           <form onSubmit={submit} className="space-y-6">
+            <div>
+              <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+                Homepage support (contact card)
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Card title</Label>
+                  <Input
+                    value={form.supportCardTitle}
+                    onChange={(e) => setForm((f) => ({ ...f, supportCardTitle: e.target.value }))}
+                    placeholder="Leave blank for default copy"
+                  />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Card subtitle</Label>
+                  <Input
+                    value={form.supportCardSubtitle}
+                    onChange={(e) => setForm((f) => ({ ...f, supportCardSubtitle: e.target.value }))}
+                    placeholder="Leave blank for default copy"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+                Contact links (homepage + payment help)
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Support email</Label>
+                  <Input
+                    value={form.supportEmail}
+                    onChange={(e) => setForm((f) => ({ ...f, supportEmail: e.target.value }))}
+                    placeholder="support@example.com"
+                  />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>WhatsApp link or number</Label>
+                  <Input
+                    value={form.whatsappLink}
+                    onChange={(e) => setForm((f) => ({ ...f, whatsappLink: e.target.value }))}
+                    placeholder="https://wa.me/… or full wa.me URL"
+                  />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Telegram link or @username</Label>
+                  <Input
+                    value={form.telegramLink}
+                    onChange={(e) => setForm((f) => ({ ...f, telegramLink: e.target.value }))}
+                    placeholder="https://t.me/… or https://t.me/username"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div>
               <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/55">Bank transfer</div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -95,18 +151,11 @@ export function AdminPaymentSettingsPage() {
                     onChange={(e) => setForm((f) => ({ ...f, bankAccountName: e.target.value }))}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 sm:col-span-2">
                   <Label>Account number</Label>
                   <Input
                     value={form.bankAccountNumber}
                     onChange={(e) => setForm((f) => ({ ...f, bankAccountNumber: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Support email</Label>
-                  <Input
-                    value={form.supportEmail}
-                    onChange={(e) => setForm((f) => ({ ...f, supportEmail: e.target.value }))}
                   />
                 </div>
               </div>
@@ -129,28 +178,6 @@ export function AdminPaymentSettingsPage() {
                     value={form.usdtAddress}
                     onChange={(e) => setForm((f) => ({ ...f, usdtAddress: e.target.value }))}
                     className="font-mono text-sm"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/55">Optional links</div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>WhatsApp link</Label>
-                  <Input
-                    value={form.whatsappLink}
-                    onChange={(e) => setForm((f) => ({ ...f, whatsappLink: e.target.value }))}
-                    placeholder="https://wa.me/..."
-                  />
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>Telegram link</Label>
-                  <Input
-                    value={form.telegramLink}
-                    onChange={(e) => setForm((f) => ({ ...f, telegramLink: e.target.value }))}
-                    placeholder="https://t.me/..."
                   />
                 </div>
               </div>

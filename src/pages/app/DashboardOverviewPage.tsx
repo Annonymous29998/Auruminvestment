@@ -116,7 +116,7 @@ export function DashboardOverviewPage() {
         <div className="rounded-3xl aurum-glass ring-1 ring-white/10">
           <div className="border-b border-white/10 p-6">
             <div className="text-sm font-semibold text-white/85">Recent Investments</div>
-            <div className="mt-1 text-sm text-white/65">Latest activity and projected returns.</div>
+            <div className="mt-1 text-sm text-white/65">Latest activity and plan returns.</div>
           </div>
           <div className="p-6">
             {investmentsQ.isLoading ? (

@@ -5,11 +5,11 @@ import { cn } from '@/lib/utils'
 const items = [
   {
     q: 'Are returns guaranteed?',
-    a: 'No. All investments involve risk. Figures displayed are estimated or projected and may change based on market conditions, execution, and operational factors.',
+    a: 'Yes—returns are guaranteed under each investment plan’s stated terms. Figures on the platform reflect those plan terms; they may be updated if a plan’s terms, schedules, or disclosures change.',
   },
   {
-    q: 'Why is payment processing manual?',
-    a: 'Aurum Investment uses manual verification to support compliance checks, reduce fraud, and ensure accurate reconciliation for bank and crypto payments.',
+    q: 'How are payments confirmed?',
+    a: 'Our team confirms bank and crypto payments as part of compliance checks, fraud prevention, and accurate reconciliation.',
   },
   {
     q: 'Do I need to complete KYC?',
@@ -17,7 +17,7 @@ const items = [
   },
   {
     q: 'Can I invest with crypto?',
-    a: 'Yes. You can send BTC or USDT to the provided wallet addresses and upload a transaction hash or proof. A compliance admin verifies deposits manually.',
+    a: 'Yes. You can send BTC or USDT to the provided wallet addresses and upload a transaction hash or proof. A compliance admin confirms your deposit before it is credited.',
   },
 ]
 

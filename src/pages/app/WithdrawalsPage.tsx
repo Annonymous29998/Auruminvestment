@@ -19,6 +19,7 @@ import {
 } from '@/features/withdrawals/withdrawalDestination'
 import { createWithdrawalRequest, getWithdrawals } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { useToastStore } from '@/stores/toastStore'
 
 const WALLET_NETWORKS = ['BTC', 'ETH', 'USDT (TRC20)', 'USDT (ERC20)', 'USDC', 'Other'] as const
@@ -84,7 +85,7 @@ export function WithdrawalsPage() {
   function submit(e: FormEvent) {
     e.preventDefault()
     if (!isSupabaseConfigured) {
-      toast({ tone: 'warning', title: 'Configuration required', message: 'Supabase is not configured.' })
+      toast({ tone: 'warning', title: uiCopy.toastBackendTitle, message: uiCopy.toastBackendMessage })
       return
     }
     if (!userId) {
@@ -267,7 +268,7 @@ export function WithdrawalsPage() {
                   {createM.isPending ? 'Submitting…' : 'Submit withdrawal request'}
                 </Button>
                 <div className="mt-3 text-xs leading-relaxed text-white/55">
-                  Investments involve risk and returns are not guaranteed. Withdrawals may be subject to compliance checks.
+                  Returns follow your enrolled plan’s terms. Withdrawals may be subject to compliance checks.
                 </div>
               </div>
             </form>

@@ -10,7 +10,7 @@ export function MarketingFooter() {
             <AurumMark />
             <div className="mt-4 max-w-sm text-sm text-white/60">
               A premium fintech experience for participating in African gold-backed opportunities.
-              Manual payment verification and compliance-first onboarding.
+              Payment confirmation by our team and compliance-first onboarding.
             </div>
           </div>
 
@@ -60,9 +60,9 @@ export function MarketingFooter() {
                 Trust
               </div>
               <div className="mt-4 space-y-2 text-sm text-white/60">
-                <div>Investments involve risk.</div>
+                <div>Returns follow published plan terms.</div>
                 <div>KYC verification required.</div>
-                <div>Manual payment verification.</div>
+                <div>Payments confirmed before crediting.</div>
               </div>
             </div>
           </div>
@@ -70,7 +70,7 @@ export function MarketingFooter() {
 
         <div className="mt-10 flex flex-col gap-3 border-t border-white/8 pt-6 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
           <div>© {new Date().getFullYear()} Aurum Investment. All rights reserved.</div>
-          <div>Gold-backed opportunities are subject to market and operational risk.</div>
+          <div>Payouts follow each plan’s published terms; operational factors may affect timing.</div>
         </div>
       </div>
     </footer>

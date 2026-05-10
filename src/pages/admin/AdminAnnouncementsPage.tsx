@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { adminSendAnnouncement } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { useToastStore } from '@/stores/toastStore'
 
 export function AdminAnnouncementsPage() {
@@ -32,7 +33,7 @@ export function AdminAnnouncementsPage() {
   function submit(e: FormEvent) {
     e.preventDefault()
     if (!isSupabaseConfigured) {
-      toast({ tone: 'warning', title: 'Supabase required', message: 'Configure Supabase to send announcements.' })
+      toast({ tone: 'warning', title: uiCopy.toastBackendTitle, message: uiCopy.toastBackendMessage })
       return
     }
     if (!title.trim() || !message.trim()) {
@@ -69,7 +70,7 @@ export function AdminAnnouncementsPage() {
               {m.isPending ? 'Sending…' : 'Send announcement'}
             </Button>
             <div className="text-xs text-white/55">
-              Avoid guaranteed returns language. Use professional, compliance-approved messaging.
+              Keep messaging aligned with published plan terms and disclosures. Avoid promises beyond what plans state.
             </div>
           </form>
         </CardContent>

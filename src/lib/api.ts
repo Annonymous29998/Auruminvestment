@@ -1,5 +1,6 @@
 import type { AppUser } from '@/features/auth/authTypes'
 import { env, isSupabaseConfigured } from '@/lib/env'
+import { ERR_BACKEND_NOT_CONFIGURED } from '@/lib/uiCopy'
 import { getSupabase } from '@/lib/supabaseClient'
 import type {
   Investment,
@@ -13,7 +14,7 @@ import type {
 
 function assertSupabase() {
   if (!isSupabaseConfigured) {
-    throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
+    throw new Error(ERR_BACKEND_NOT_CONFIGURED)
   }
   return getSupabase()
 }
@@ -98,6 +99,10 @@ export async function adminGetOverviewMetrics(): Promise<AdminOverviewMetrics> {
   }
 }
 
+export const DEFAULT_SUPPORT_CARD_TITLE = 'Contact our admin team'
+export const DEFAULT_SUPPORT_CARD_SUBTITLE =
+  'Payment confirmation and KYC review are handled by support.'
+
 export type PaymentDisplaySettings = {
   bankName: string
   bankAccountName: string
@@ -107,6 +112,8 @@ export type PaymentDisplaySettings = {
   telegramLink: string
   btcAddress: string
   usdtAddress: string
+  supportCardTitle: string
+  supportCardSubtitle: string
 }
 
 /** Per-field: non-empty DB value wins; otherwise Vite env defaults (marketing / .env). */
@@ -114,6 +121,10 @@ export function mergePaymentDisplayWithEnv(db: PaymentDisplaySettings | null | u
   const pick = (dbVal: string | null | undefined, envVal: string) => {
     const t = (dbVal ?? '').trim()
     return t.length ? t : envVal
+  }
+  const pickText = (dbVal: string | null | undefined, fallback: string) => {
+    const t = (dbVal ?? '').trim()
+    return t.length ? t : fallback
   }
   return {
     bankName: pick(db?.bankName, env.bankName),
@@ -124,6 +135,8 @@ export function mergePaymentDisplayWithEnv(db: PaymentDisplaySettings | null | u
     telegramLink: pick(db?.telegramLink, env.telegramLink),
     btcAddress: pick(db?.btcAddress, env.btcAddress),
     usdtAddress: pick(db?.usdtAddress, env.usdtAddress),
+    supportCardTitle: pickText(db?.supportCardTitle, DEFAULT_SUPPORT_CARD_TITLE),
+    supportCardSubtitle: pickText(db?.supportCardSubtitle, DEFAULT_SUPPORT_CARD_SUBTITLE),
   }
 }
 
@@ -137,6 +150,8 @@ function mapPaymentDisplayRow(row: Record<string, unknown>): PaymentDisplaySetti
     telegramLink: String(row.telegram_link ?? ''),
     btcAddress: String(row.btc_address ?? ''),
     usdtAddress: String(row.usdt_address ?? ''),
+    supportCardTitle: String(row.support_card_title ?? ''),
+    supportCardSubtitle: String(row.support_card_subtitle ?? ''),
   }
 }
 
@@ -166,6 +181,8 @@ export async function adminUpsertPaymentDisplaySettings(args: PaymentDisplaySett
       telegram_link: args.telegramLink,
       btc_address: args.btcAddress,
       usdt_address: args.usdtAddress,
+      support_card_title: args.supportCardTitle,
+      support_card_subtitle: args.supportCardSubtitle,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'id' },
@@ -609,6 +626,13 @@ export async function adminListUsers(): Promise<
     balanceUsd: u.balance_usd ?? 0,
     kycStatus: u.kyc_status ?? 'not_submitted',
   }))
+}
+
+/** Removes Supabase Auth user; `public.users` and dependent rows CASCADE. Admins and self-deletion blocked in RPC. */
+export async function adminDeleteUser(args: { userId: string }): Promise<void> {
+  const supabase = assertSupabase()
+  const { error } = await supabase.rpc('admin_delete_user', { target_user_id: args.userId })
+  if (error) throw new Error(error.message)
 }
 
 export async function adminAdjustUserBalance(args: { userId: string; newBalanceUsd: number }): Promise<void> {

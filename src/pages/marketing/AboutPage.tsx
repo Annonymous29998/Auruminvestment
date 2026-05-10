@@ -18,7 +18,7 @@ export function AboutPage() {
                 <ShieldCheck className="h-6 w-6 text-gold" />
                 <div className="mt-3 text-base font-semibold text-white/90">Trust & Compliance</div>
                 <div className="mt-2 text-sm leading-relaxed text-white/70">
-                  KYC verification, AML checks, and manual payment review are designed to support fraud prevention and
+                  KYC verification, AML checks, and payment confirmation are designed to support fraud prevention and
                   auditability.
                 </div>
               </div>

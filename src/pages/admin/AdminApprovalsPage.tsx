@@ -16,6 +16,7 @@ import {
   adminRejectPaymentProof,
 } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { useToastStore } from '@/stores/toastStore'
 
 export function AdminApprovalsPage() {
@@ -99,14 +100,14 @@ export function AdminApprovalsPage() {
     <div>
       <PageHeader
         title="Approvals"
-        subtitle="Approve investments and deposits after manual review."
+        subtitle="Approve investments and deposits after compliance review."
       />
 
       {!isSupabaseConfigured ? (
         <EmptyState
           icon={<ShieldCheck className="h-5 w-5 text-gold" />}
-          title="Supabase required"
-          description="Configure Supabase to load pending approvals."
+          title={uiCopy.emptyStateBackendTitle}
+          description={uiCopy.emptyStateBackendDescription}
         />
       ) : (
         <div className="space-y-4">

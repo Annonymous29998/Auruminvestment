@@ -9,13 +9,13 @@ const steps = [
   },
   {
     icon: ShieldCheck,
-    title: 'Complete KYC & fund manually',
-    desc: 'Upload KYC documents and fund via bank transfer, card assistance, or crypto. Payments are verified manually for compliance.',
+    title: 'Complete KYC & add funds',
+    desc: 'Upload KYC documents and fund via bank transfer, card assistance, or crypto. Payments go through compliance review before they are credited to your account.',
   },
   {
     icon: TrendingUp,
     title: 'Track your investment',
-    desc: 'Monitor status, projected returns, history, and notifications in a premium dashboard built for clarity and trust.',
+    desc: 'Monitor status, plan returns, history, and notifications in a premium dashboard built for clarity and trust.',
   },
 ]
 
@@ -30,7 +30,7 @@ export function HowItWorks() {
               A compliance-first flow
             </div>
             <div className="mt-2 max-w-2xl text-sm text-white/65">
-              Designed for manual verification, audit trails, and professional investor reporting.
+              Designed for payment confirmation, audit trails, and professional investor reporting.
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
@@ -10,6 +10,7 @@ import { useToastStore } from '@/stores/toastStore'
 
 export function SignupPage() {
   const toast = useToastStore((s) => s.push)
+  const navigate = useNavigate()
   const { signUp } = useAuth()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -20,12 +21,19 @@ export function SignupPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      await signUp({ email, password, fullName: fullName || undefined })
+      const { hasSession } = await signUp({ email, password, fullName: fullName || undefined })
       toast({
         tone: 'success',
-        title: 'Account created',
-        message: 'If email verification is enabled, please verify before signing in.',
+        title: 'Account created successfully',
+        message: hasSession
+          ? 'Taking you to your dashboard…'
+          : 'Check your inbox for a link to finish setup, then sign in.',
       })
+      if (hasSession) {
+        navigate('/app', { replace: true })
+      } else {
+        navigate('/auth/verify-email', { replace: true })
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unable to sign up'
       toast({ tone: 'danger', title: 'Sign up failed', message })
@@ -75,7 +83,7 @@ export function SignupPage() {
       </form>
 
       <div className="text-xs text-white/55">
-        By continuing you acknowledge investment risk and agree to complete KYC verification where required.
+        By continuing you acknowledge each plan’s terms and agree to complete KYC verification where required.
       </div>
 
       <div className="text-sm text-white/65">

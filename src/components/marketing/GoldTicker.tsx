@@ -1,86 +1,84 @@
-import { motion } from 'framer-motion'
-import { useEffect, useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { fetchGoldSpotTicker } from '@/lib/goldSpotTicker'
 
-type Quote = {
+function formatTickerPrice(symbol: string, price: number) {
+  if (symbol === 'XAU/USD') {
+    return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  }
+  return price.toLocaleString('en-US', { maximumFractionDigits: 0 })
+}
+
+function TickerCard({
+  symbol,
+  price,
+  changePct,
+}: {
   symbol: string
   price: number
   changePct: number
-}
-
-function mulberry32(seed: number) {
-  return function next() {
-    let t = (seed += 0x6d2b79f5)
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
-function jitter(n: number, pct: number, rnd: () => number) {
-  const amp = n * pct
-  return n + (rnd() * 2 - 1) * amp
+}) {
+  return (
+    <div className="min-w-[220px] shrink-0 rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+      <div className="text-xs font-semibold uppercase tracking-wider text-white/55">{symbol}</div>
+      <div className="mt-2 flex items-end justify-between gap-3">
+        <div className="text-lg font-semibold text-white/90">{formatTickerPrice(symbol, price)}</div>
+        <div className={`text-sm font-semibold ${changePct >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+          {changePct >= 0 ? '+' : ''}
+          {changePct.toFixed(2)}%
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function GoldTicker() {
-  const [tick, setTick] = useState(0)
+  const q = useQuery({
+    queryKey: ['gold-spot-ticker'],
+    queryFn: fetchGoldSpotTicker,
+    staleTime: 60_000,
+    refetchInterval: 120_000,
+    retry: 1,
+  })
 
-  useEffect(() => {
-    const id = window.setInterval(() => setTick((t) => t + 1), 2200)
-    return () => window.clearInterval(id)
-  }, [])
-
-  const quotes = useMemo<Quote[]>(() => {
-    const rnd = mulberry32(0xA11CE ^ (tick + 1) * 2654435761)
-    const base = [
-      { symbol: 'XAU/USD', price: 2368.4, changePct: 0.62 },
-      { symbol: 'XAU/NGN', price: 3689120, changePct: -0.28 },
-      { symbol: 'XAU/ZAR', price: 44055, changePct: 0.41 },
-      { symbol: 'XAU/GHS', price: 33345, changePct: 0.15 },
-    ]
-    return base.map((q, idx) => {
-      const localRnd = mulberry32(Math.floor(rnd() * 1_000_000) + idx * 97)
-      return {
-      symbol: q.symbol,
-      price:
-        q.symbol === 'XAU/USD' ? jitter(q.price, 0.002, localRnd) : jitter(q.price, 0.003, localRnd),
-      changePct: jitter(q.changePct, 0.18, localRnd),
-      }
-    })
-  }, [tick])
+  const quotes = q.data?.quotes ?? []
+  const doubled = quotes.length ? [...quotes, ...quotes] : []
 
   return (
     <div className="overflow-hidden rounded-3xl aurum-glass ring-1 ring-white/10">
-      <div className="flex items-center gap-3 border-b border-white/8 px-5 py-4">
-        <div className="h-2 w-2 rounded-full bg-gold" />
+      <div className="flex flex-wrap items-center gap-2 border-b border-white/8 px-5 py-4 sm:gap-3">
+        <div className="h-2 w-2 shrink-0 rounded-full bg-gold" />
         <div className="text-sm font-semibold text-white/85">Live Gold Snapshot</div>
-        <div className="ml-auto text-xs text-white/55">Indicative market snapshot</div>
+        {q.data?.asOfDate ? (
+          <div className="ml-auto text-xs text-white/55">As of {q.data.asOfDate}</div>
+        ) : null}
       </div>
-      <div className="flex gap-3 p-4">
-        {quotes.map((q) => (
-          <motion.div
-            key={q.symbol}
-            layout
-            transition={{ duration: 0.35, type: 'spring', bounce: 0.18 }}
-            className="min-w-[220px] flex-1 rounded-2xl bg-white/5 p-4 ring-1 ring-white/10"
-          >
-            <div className="text-xs font-semibold uppercase tracking-wider text-white/55">{q.symbol}</div>
-            <div className="mt-2 flex items-end justify-between gap-3">
-              <div className="text-lg font-semibold text-white/90">
-                {q.symbol === 'XAU/USD'
-                  ? `$${q.price.toFixed(2)}`
-                  : q.price.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-              </div>
+
+      <div className="relative py-4">
+        {q.isLoading ? (
+          <div className="flex gap-3 overflow-hidden px-4">
+            {Array.from({ length: 4 }).map((_, i) => (
               <div
-                className={`text-sm font-semibold ${
-                  q.changePct >= 0 ? 'text-emerald-300' : 'text-rose-300'
-                }`}
+                key={i}
+                className="min-w-[220px] shrink-0 animate-pulse rounded-2xl bg-white/5 p-4 ring-1 ring-white/10"
               >
-                {q.changePct >= 0 ? '+' : ''}
-                {q.changePct.toFixed(2)}%
+                <div className="h-3 w-20 rounded bg-white/10" />
+                <div className="mt-4 h-6 w-32 rounded bg-white/10" />
               </div>
+            ))}
+          </div>
+        ) : q.isError || !doubled.length ? (
+          <div className="px-5 py-2 text-sm text-white/60">
+            Live prices are temporarily unavailable. The gold chart below may still load from cache.
+          </div>
+        ) : (
+          <div className="aurum-gold-marquee-mask">
+            <div className="aurum-gold-marquee-track flex gap-3 px-4">
+              {doubled.map((item, i) => (
+                <TickerCard key={`${item.symbol}-${i}`} {...item} />
+              ))}
             </div>
-          </motion.div>
-        ))}
+          </div>
+        )}
       </div>
     </div>
   )

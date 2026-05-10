@@ -8,7 +8,7 @@ export function HowItWorksPage() {
       <PageHero
         eyebrow="Process"
         title="How Aurum Works"
-        subtitle="A professional flow designed for manual verification, clear audit trails, and an investor-first dashboard experience."
+        subtitle="A professional flow designed for payment confirmation, clear audit trails, and an investor-first dashboard experience."
       />
       <HowItWorks />
       <RiskDisclaimer />

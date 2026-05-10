@@ -7,7 +7,7 @@ export function FaqPage() {
       <PageHero
         eyebrow="Help"
         title="Frequently Asked Questions"
-        subtitle="Quick answers about manual payment verification, KYC requirements, and how projected returns are displayed on the platform."
+        subtitle="Quick answers about payment confirmation, KYC requirements, and how plan returns are shown on the platform."
       />
       <Faq />
     </div>

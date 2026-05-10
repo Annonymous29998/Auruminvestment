@@ -13,6 +13,7 @@ import { estimateProjectedReturn, formatUsd } from '@/features/investments/calcu
 import { useAuth } from '@/features/auth/AuthProvider'
 import { createInvestmentRequest, ensureUserProfile, getInvestmentPlans } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { userFacingErrorMessage } from '@/lib/uiCopy'
 import { useToastStore } from '@/stores/toastStore'
 import type { InvestmentPlan } from '@/types/domain'
 
@@ -106,14 +107,16 @@ export function PlansPage() {
       setStep('payment')
     } catch (err) {
       const raw = getErrorMessage(err)
-      let message = raw
+      let message: string
       if (raw.includes('violates foreign key constraint') && raw.includes('investments_user_id_fkey')) {
         message =
-          'Your profile is not ready yet. In Supabase, run the SQL that creates the user profile trigger + insert policy, then refresh and try again.'
+          'Your account profile is still being set up. Wait a moment, refresh the page, and try again—or contact support.'
       } else if (raw.toLowerCase().includes('row-level security')) {
-        message = 'Your Supabase security rules blocked this action. Please apply the users insert policy + trigger, then try again.'
+        message = 'This action could not be completed. Contact support if it continues.'
       } else if (raw.toLowerCase().includes('jwt') && raw.toLowerCase().includes('expired')) {
         message = 'Your session expired. Please sign in again and retry.'
+      } else {
+        message = userFacingErrorMessage(err)
       }
       toast({ tone: 'danger', title: 'Request failed', message })
     }
@@ -170,11 +173,11 @@ export function PlansPage() {
                     </div>
                   </div>
                   <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                    <div className="text-xs text-white/55">Estimated ROI</div>
+                    <div className="text-xs text-white/55">Stated ROI</div>
                     <div className="mt-1 text-sm font-semibold text-white/85">{p.estimatedRoiPercent}%</div>
                   </div>
                   <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                    <div className="text-xs text-white/55">Projected</div>
+                    <div className="text-xs text-white/55">Plan payout</div>
                     <div className="mt-1 text-sm font-semibold text-white/85">
                       {formatUsd(estimateProjectedReturn({ principalUsd: p.minInvestmentUsd, roiPercent: p.estimatedRoiPercent }))}
                     </div>
@@ -192,7 +195,7 @@ export function PlansPage() {
 
                 <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-xs text-white/55">
-                    Returns are estimates and not guaranteed. KYC verification required before withdrawals.
+                    Returns are guaranteed under each plan’s published terms. KYC verification required before withdrawals.
                   </div>
                   <Button variant="primary" onClick={() => openInvest(p)}>
                     Invest <ArrowRight className="h-4 w-4" />
@@ -229,10 +232,11 @@ export function PlansPage() {
                 </div>
               </div>
               <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                <div className="text-xs text-white/55">Estimated return</div>
+                <div className="text-xs text-white/55">Return at maturity</div>
                 <div className="mt-2 text-lg font-semibold text-white/90">{formatUsd(projected)}</div>
                 <div className="mt-1 text-xs text-white/55">
-                  Based on projected ROI of {selectedPlan.estimatedRoiPercent}% over {selectedPlan.durationDays} days.
+                  Based on your plan’s stated ROI of {selectedPlan.estimatedRoiPercent}% over {selectedPlan.durationDays}{' '}
+                  days (per plan terms).
                 </div>
               </div>
             </div>

@@ -11,6 +11,8 @@ create table if not exists public.payment_display_settings (
   telegram_link text not null default '',
   btc_address text not null default '',
   usdt_address text not null default '',
+  support_card_title text not null default '',
+  support_card_subtitle text not null default '',
   updated_at timestamptz not null default now()
 );
 

@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { formatUsd } from '@/features/investments/calculator'
 import { adminApprovePaymentProof, adminListPaymentProofs, adminRejectPaymentProof } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
+import { uiCopy } from '@/lib/uiCopy'
 import { getSupabase } from '@/lib/supabaseClient'
 import { useToastStore } from '@/stores/toastStore'
 
@@ -70,14 +71,14 @@ export function AdminProofsPage() {
     <div>
       <PageHeader
         title="Payment Proofs"
-        subtitle="Review uploaded proofs and confirm deposits manually."
+        subtitle="Review uploaded proofs and confirm deposits."
       />
 
       {!isSupabaseConfigured ? (
         <EmptyState
           icon={<CreditCard className="h-5 w-5 text-gold" />}
-          title="Supabase required"
-          description="Configure Supabase Storage and Database to manage uploaded proofs."
+          title={uiCopy.emptyStateBackendTitle}
+          description="File storage and the database must be connected before you can manage proofs here."
         />
       ) : (
         <Card className="ring-1 ring-white/10">
