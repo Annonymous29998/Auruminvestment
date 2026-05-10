@@ -73,6 +73,8 @@ The service role exists only to let the **seed script** call Admin APIs (`auth.a
 
 After connecting **auruminvestment.online** in Vercel → Domains, redeploy so the live URL matches what you configured in Supabase.
 
+**Avoid redirect loops:** In Vercel → Domains, pick **one** primary host (apex `auruminvestment.online` *or* `www`). At your DNS registrar, point **only** the records Vercel shows (usually apex `A` and `www` `CNAME`)—do **not** also add a registrar “URL redirect” from apex ↔ www, or you can get `ERR_TOO_MANY_REDIRECTS`. This repo’s `vercel.json` only includes SPA rewrites (no www redirect) so Vercel + DNS stay in control of canonical URLs.
+
 ## Payment confirmation flow (important)
 
 - Card payment / bank transfer: users see a modal with instructions to contact admin support to complete payment
