@@ -112,12 +112,14 @@ export function AdminApprovalsPage() {
       ) : (
         <div className="space-y-4">
           <Card className="ring-1 ring-white/10">
-            <CardHeader className="flex-row items-center justify-between pb-0">
-              <div>
+            <CardHeader className="flex flex-col gap-2 pb-0 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <CardTitle className="text-base">Pending investments</CardTitle>
                 <div className="mt-1 text-sm text-white/65">Approve or reject new investment requests.</div>
               </div>
-              <Badge tone="warning">{invQ.data?.length ?? 0}</Badge>
+              <Badge tone="warning" className="w-fit">
+                {invQ.data?.length ?? 0}
+              </Badge>
             </CardHeader>
             <CardContent className="pt-6">
               {invQ.isLoading ? (
@@ -131,26 +133,65 @@ export function AdminApprovalsPage() {
                   description={invQ.error instanceof Error ? invQ.error.message : 'Check your admin access policies.'}
                 />
               ) : invQ.data?.length ? (
-                <div className="overflow-hidden rounded-2xl ring-1 ring-white/10">
-                  <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
-                    <div className="col-span-5">User</div>
-                    <div className="col-span-3">Plan</div>
-                    <div className="col-span-2">Amount</div>
-                    <div className="col-span-2 text-right">Action</div>
-                  </div>
-                  <div className="divide-y divide-white/10">
-                    {invQ.data.map((inv) => (
-                      <div key={inv.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
-                        <div className="col-span-5 min-w-0">
-                          <div className="truncate font-semibold text-white/85">{inv.userEmail || inv.userId}</div>
-                          <div className="mt-1 truncate text-xs text-white/55">{inv.userFullName ?? '—'}</div>
+                <>
+                  <div className="hidden overflow-hidden rounded-2xl ring-1 ring-white/10 md:block">
+                    <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+                      <div className="col-span-5">User</div>
+                      <div className="col-span-3">Plan</div>
+                      <div className="col-span-2">Amount</div>
+                      <div className="col-span-2 text-right">Action</div>
+                    </div>
+                    <div className="divide-y divide-white/10">
+                      {invQ.data.map((inv) => (
+                        <div key={inv.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
+                          <div className="col-span-5 min-w-0">
+                            <div className="truncate font-semibold text-white/85">{inv.userEmail || inv.userId}</div>
+                            <div className="mt-1 truncate text-xs text-white/55">{inv.userFullName ?? '—'}</div>
+                          </div>
+                          <div className="col-span-3 text-white/80">{inv.planName}</div>
+                          <div className="col-span-2 text-white/80">{formatUsd(inv.amountUsd)}</div>
+                          <div className="col-span-2 flex justify-end gap-2">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => approveInvestmentM.mutate(inv.id)}
+                              disabled={approveInvestmentM.isPending || rejectInvestmentM.isPending}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => rejectInvestmentM.mutate(inv.id)}
+                              disabled={approveInvestmentM.isPending || rejectInvestmentM.isPending}
+                            >
+                              Reject
+                            </Button>
+                          </div>
                         </div>
-                        <div className="col-span-3 text-white/80">{inv.planName}</div>
-                        <div className="col-span-2 text-white/80">{formatUsd(inv.amountUsd)}</div>
-                        <div className="col-span-2 flex justify-end gap-2">
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-3 md:hidden">
+                    {invQ.data.map((inv) => (
+                      <div key={inv.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+                        <div className="break-words font-semibold text-white/85">{inv.userEmail || inv.userId}</div>
+                        <div className="mt-1 text-sm text-white/55">{inv.userFullName ?? '—'}</div>
+                        <dl className="mt-3 grid gap-2 text-sm">
+                          <div className="flex justify-between gap-3">
+                            <dt className="text-white/50">Plan</dt>
+                            <dd className="text-right font-medium text-white/85">{inv.planName}</dd>
+                          </div>
+                          <div className="flex justify-between gap-3">
+                            <dt className="text-white/50">Amount</dt>
+                            <dd className="font-semibold text-white/85">{formatUsd(inv.amountUsd)}</dd>
+                          </div>
+                        </dl>
+                        <div className="mt-4 flex gap-2">
                           <Button
                             variant="secondary"
                             size="sm"
+                            className="flex-1"
                             onClick={() => approveInvestmentM.mutate(inv.id)}
                             disabled={approveInvestmentM.isPending || rejectInvestmentM.isPending}
                           >
@@ -159,6 +200,7 @@ export function AdminApprovalsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="flex-1"
                             onClick={() => rejectInvestmentM.mutate(inv.id)}
                             disabled={approveInvestmentM.isPending || rejectInvestmentM.isPending}
                           >
@@ -168,7 +210,7 @@ export function AdminApprovalsPage() {
                       </div>
                     ))}
                   </div>
-                </div>
+                </>
               ) : (
                 <div className="text-sm text-white/65">No pending investment requests.</div>
               )}
@@ -176,12 +218,14 @@ export function AdminApprovalsPage() {
           </Card>
 
           <Card className="ring-1 ring-white/10">
-            <CardHeader className="flex-row items-center justify-between pb-0">
-              <div>
+            <CardHeader className="flex flex-col gap-2 pb-0 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <CardTitle className="text-base">Pending payment proofs</CardTitle>
                 <div className="mt-1 text-sm text-white/65">Approve deposits and update balances.</div>
               </div>
-              <Badge tone="warning">{proofsQ.data?.length ?? 0}</Badge>
+              <Badge tone="warning" className="w-fit">
+                {proofsQ.data?.length ?? 0}
+              </Badge>
             </CardHeader>
             <CardContent className="pt-6">
               {proofsQ.isLoading ? (
@@ -195,28 +239,61 @@ export function AdminApprovalsPage() {
                   description={proofsQ.error instanceof Error ? proofsQ.error.message : 'Check your admin access policies.'}
                 />
               ) : proofsQ.data?.length ? (
-                <div className="overflow-hidden rounded-2xl ring-1 ring-white/10">
-                  <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
-                    <div className="col-span-5">User</div>
-                    <div className="col-span-3">Method</div>
-                    <div className="col-span-2">Amount</div>
-                    <div className="col-span-2 text-right">Action</div>
+                <>
+                  <div className="hidden overflow-hidden rounded-2xl ring-1 ring-white/10 md:block">
+                    <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+                      <div className="col-span-5">User</div>
+                      <div className="col-span-3">Method</div>
+                      <div className="col-span-2">Amount</div>
+                      <div className="col-span-2 text-right">Action</div>
+                    </div>
+                    <div className="divide-y divide-white/10">
+                      {proofsQ.data.map((p) => (
+                        <div key={p.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
+                          <div className="col-span-5 min-w-0">
+                            <div className="truncate font-semibold text-white/85">{p.userEmail || p.userId}</div>
+                            <div className="mt-1 truncate text-xs text-white/55">{p.userFullName ?? '—'}</div>
+                          </div>
+                          <div className="col-span-3 text-white/80">
+                            <Badge tone="neutral">{String(p.method).toUpperCase()}</Badge>
+                          </div>
+                          <div className="col-span-2 text-white/80">{formatUsd(p.amountUsd)}</div>
+                          <div className="col-span-2 flex justify-end gap-2">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => approveProofM.mutate(p.id)}
+                              disabled={approveProofM.isPending || rejectProofM.isPending}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => rejectProofM.mutate(p.id)}
+                              disabled={approveProofM.isPending || rejectProofM.isPending}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="divide-y divide-white/10">
+                  <div className="space-y-3 md:hidden">
                     {proofsQ.data.map((p) => (
-                      <div key={p.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
-                        <div className="col-span-5 min-w-0">
-                          <div className="truncate font-semibold text-white/85">{p.userEmail || p.userId}</div>
-                          <div className="mt-1 truncate text-xs text-white/55">{p.userFullName ?? '—'}</div>
-                        </div>
-                        <div className="col-span-3 text-white/80">
+                      <div key={p.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+                        <div className="break-words font-semibold text-white/85">{p.userEmail || p.userId}</div>
+                        <div className="mt-1 text-sm text-white/55">{p.userFullName ?? '—'}</div>
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                           <Badge tone="neutral">{String(p.method).toUpperCase()}</Badge>
+                          <span className="font-semibold text-white/85">{formatUsd(p.amountUsd)}</span>
                         </div>
-                        <div className="col-span-2 text-white/80">{formatUsd(p.amountUsd)}</div>
-                        <div className="col-span-2 flex justify-end gap-2">
+                        <div className="mt-4 flex gap-2">
                           <Button
                             variant="secondary"
                             size="sm"
+                            className="flex-1"
                             onClick={() => approveProofM.mutate(p.id)}
                             disabled={approveProofM.isPending || rejectProofM.isPending}
                           >
@@ -225,6 +302,7 @@ export function AdminApprovalsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="flex-1"
                             onClick={() => rejectProofM.mutate(p.id)}
                             disabled={approveProofM.isPending || rejectProofM.isPending}
                           >
@@ -234,7 +312,7 @@ export function AdminApprovalsPage() {
                       </div>
                     ))}
                   </div>
-                </div>
+                </>
               ) : (
                 <div className="text-sm text-white/65">No pending payment proofs.</div>
               )}

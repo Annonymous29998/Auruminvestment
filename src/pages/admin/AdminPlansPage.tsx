@@ -154,12 +154,12 @@ export function AdminPlansPage() {
         />
       ) : (
         <Card className="ring-1 ring-white/10">
-          <CardHeader className="flex-row items-center justify-between pb-0">
-            <div>
+          <CardHeader className="flex flex-col gap-3 pb-0 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <CardTitle className="text-base">Investment plans</CardTitle>
               <div className="mt-1 text-sm text-white/65">Create, edit, and activate plans.</div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
               <Badge tone="neutral">{q.data?.length ?? 0}</Badge>
               <Button variant="secondary" onClick={openNew}>
                 <Plus className="h-4 w-4" />
@@ -180,35 +180,78 @@ export function AdminPlansPage() {
                 description={q.error instanceof Error ? q.error.message : 'Check your admin access policies.'}
               />
             ) : q.data?.length ? (
-              <div className="overflow-hidden rounded-2xl ring-1 ring-white/10">
-                <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
-                  <div className="col-span-5">Plan</div>
-                  <div className="col-span-2">Minimum</div>
-                  <div className="col-span-2">Duration</div>
-                  <div className="col-span-1">ROI</div>
-                  <div className="col-span-2 text-right">Action</div>
-                </div>
-                <div className="divide-y divide-white/10">
-                  {q.data.map((p) => (
-                    <div key={p.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
-                      <div className="col-span-5 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <div className="truncate font-semibold text-white/85">{p.name}</div>
-                          <Badge tone={p.active ? 'success' : 'neutral'}>{p.active ? 'ACTIVE' : 'INACTIVE'}</Badge>
+              <>
+                <div className="hidden overflow-hidden rounded-2xl ring-1 ring-white/10 md:block">
+                  <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+                    <div className="col-span-5">Plan</div>
+                    <div className="col-span-2">Minimum</div>
+                    <div className="col-span-2">Duration</div>
+                    <div className="col-span-1">ROI</div>
+                    <div className="col-span-2 text-right">Action</div>
+                  </div>
+                  <div className="divide-y divide-white/10">
+                    {q.data.map((p) => (
+                      <div key={p.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
+                        <div className="col-span-5 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <div className="truncate font-semibold text-white/85">{p.name}</div>
+                            <Badge tone={p.active ? 'success' : 'neutral'}>{p.active ? 'ACTIVE' : 'INACTIVE'}</Badge>
+                          </div>
+                          <div className="mt-1 truncate text-xs text-white/55">{p.summary}</div>
                         </div>
-                        <div className="mt-1 truncate text-xs text-white/55">{p.summary}</div>
+                        <div className="col-span-2 text-white/80">{formatUsd(Number(p.minInvestmentUsd ?? 0))}</div>
+                        <div className="col-span-2 text-white/80">{Number(p.durationDays ?? 0)} days</div>
+                        <div className="col-span-1 text-white/80">{Number(p.estimatedRoiPercent ?? 0)}%</div>
+                        <div className="col-span-2 flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => openEdit(p)}>
+                            <Pencil className="h-4 w-4" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => toggleM.mutate({ planId: p.id, active: !p.active })}
+                            disabled={toggleM.isPending}
+                          >
+                            {p.active ? 'Deactivate' : 'Activate'}
+                          </Button>
+                        </div>
                       </div>
-                      <div className="col-span-2 text-white/80">{formatUsd(Number(p.minInvestmentUsd ?? 0))}</div>
-                      <div className="col-span-2 text-white/80">{Number(p.durationDays ?? 0)} days</div>
-                      <div className="col-span-1 text-white/80">{Number(p.estimatedRoiPercent ?? 0)}%</div>
-                      <div className="col-span-2 flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => openEdit(p)}>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3 md:hidden">
+                  {q.data.map((p) => (
+                    <div key={p.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0 font-semibold text-white/85">{p.name}</div>
+                        <Badge tone={p.active ? 'success' : 'neutral'}>{p.active ? 'ACTIVE' : 'INACTIVE'}</Badge>
+                      </div>
+                      <p className="mt-2 line-clamp-3 text-sm text-white/60">{p.summary}</p>
+                      <dl className="mt-4 grid grid-cols-3 gap-2 text-sm">
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-wider text-white/50">Min</dt>
+                          <dd className="mt-0.5 text-white/85">{formatUsd(Number(p.minInvestmentUsd ?? 0))}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-wider text-white/50">Term</dt>
+                          <dd className="mt-0.5 text-white/85">{Number(p.durationDays ?? 0)}d</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-wider text-white/50">ROI</dt>
+                          <dd className="mt-0.5 text-white/85">{Number(p.estimatedRoiPercent ?? 0)}%</dd>
+                        </div>
+                      </dl>
+                      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                        <Button variant="ghost" size="sm" className="w-full sm:flex-1" onClick={() => openEdit(p)}>
                           <Pencil className="h-4 w-4" />
                           Edit
                         </Button>
                         <Button
                           variant="secondary"
                           size="sm"
+                          className="w-full sm:flex-1"
                           onClick={() => toggleM.mutate({ planId: p.id, active: !p.active })}
                           disabled={toggleM.isPending}
                         >
@@ -218,7 +261,7 @@ export function AdminPlansPage() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </>
             ) : (
               <EmptyState
                 icon={<Gem className="h-5 w-5 text-gold" />}

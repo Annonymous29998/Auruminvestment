@@ -126,7 +126,7 @@ export function AdminBalancesPage() {
             <Wallet className="h-5 w-5 text-gold" />
           </CardHeader>
           <CardContent className="pt-4">
-            <div className="overflow-x-auto">
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full min-w-[720px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-white/10 text-xs font-semibold uppercase tracking-wider text-white/55">
@@ -208,6 +208,60 @@ export function AdminBalancesPage() {
                   })}
                 </tbody>
               </table>
+            </div>
+
+            <div className="space-y-4 md:hidden">
+              {usersQ.data.map((u) => {
+                const d = draftFor(u.id)
+                return (
+                  <div key={u.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+                    <div className="break-words font-medium text-white/90">{u.email}</div>
+                    <div className="mt-1 text-xs text-white/55">{u.fullName ?? '—'}</div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <Badge tone={u.role === 'admin' ? 'warning' : 'neutral'}>{u.role.toUpperCase()}</Badge>
+                      <span className="font-semibold text-white/90">{formatUsd(u.balanceUsd)}</span>
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <Label className="text-xs text-white/55">Set new total (USD)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          inputMode="decimal"
+                          className="min-w-0 flex-1"
+                          placeholder={String(u.balanceUsd)}
+                          value={d.newTotal}
+                          onChange={(e) => setDraft(u.id, { newTotal: e.target.value })}
+                          disabled={busy(u.id)}
+                        />
+                        <Button type="button" variant="primary" size="sm" disabled={busy(u.id)} onClick={() => applySet(u.id)}>
+                          Set
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <Label className="text-xs text-white/55">Remove from balance</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          inputMode="decimal"
+                          className="min-w-0 flex-1"
+                          placeholder="0"
+                          value={d.deduct}
+                          onChange={(e) => setDraft(u.id, { deduct: e.target.value })}
+                          disabled={busy(u.id)}
+                        />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          disabled={busy(u.id)}
+                          onClick={() => applyRemove(u.id, u.balanceUsd)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
             <div className="mt-4 text-xs text-white/55">
               Set replaces the entire balance. Remove subtracts from the current balance (floors at $0). Use only with proper

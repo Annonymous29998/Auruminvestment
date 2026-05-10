@@ -82,12 +82,12 @@ export function AdminProofsPage() {
         />
       ) : (
         <Card className="ring-1 ring-white/10">
-          <CardHeader className="flex-row items-center justify-between pb-0">
-            <div>
+          <CardHeader className="flex flex-col gap-3 pb-0 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
               <CardTitle className="text-base">Proofs</CardTitle>
               <div className="mt-1 text-sm text-white/65">Review and approve deposits.</div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 lg:justify-end">
               <Button variant={filter === 'pending' ? 'secondary' : 'ghost'} size="sm" onClick={() => setFilter('pending')}>
                 Pending
               </Button>
@@ -116,37 +116,94 @@ export function AdminProofsPage() {
                 description={q.error instanceof Error ? q.error.message : 'Check your admin access policies.'}
               />
             ) : q.data?.length ? (
-              <div className="overflow-hidden rounded-2xl ring-1 ring-white/10">
-                <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
-                  <div className="col-span-4">User</div>
-                  <div className="col-span-2">Method</div>
-                  <div className="col-span-2">Amount</div>
-                  <div className="col-span-2">Status</div>
-                  <div className="col-span-2 text-right">Action</div>
+              <>
+                <div className="hidden overflow-hidden rounded-2xl ring-1 ring-white/10 md:block">
+                  <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+                    <div className="col-span-4">User</div>
+                    <div className="col-span-2">Method</div>
+                    <div className="col-span-2">Amount</div>
+                    <div className="col-span-2">Status</div>
+                    <div className="col-span-2 text-right">Action</div>
+                  </div>
+                  <div className="divide-y divide-white/10">
+                    {q.data.map((p) => (
+                      <div key={p.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
+                        <div className="col-span-4 min-w-0">
+                          <div className="truncate font-semibold text-white/85">{p.userEmail || p.userId}</div>
+                          <div className="mt-1 truncate text-xs text-white/55">{p.userFullName ?? '—'}</div>
+                        </div>
+                        <div className="col-span-2">
+                          <Badge tone="neutral">{String(p.method).toUpperCase()}</Badge>
+                        </div>
+                        <div className="col-span-2 text-white/80">{formatUsd(p.amountUsd)}</div>
+                        <div className="col-span-2">
+                          <Badge
+                            tone={p.status === 'approved' ? 'success' : p.status === 'rejected' ? 'danger' : 'warning'}
+                          >
+                            {String(p.status).toUpperCase()}
+                          </Badge>
+                        </div>
+                        <div className="col-span-2 flex flex-wrap justify-end gap-2">
+                          {p.storagePath ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                viewProof(p.storagePath!).catch((err) => {
+                                  const msg = err instanceof Error ? err.message : 'Unable to preview'
+                                  toast({ tone: 'danger', title: 'Preview failed', message: msg })
+                                })
+                              }
+                            >
+                              View
+                            </Button>
+                          ) : null}
+                          {p.status === 'pending' ? (
+                            <>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => approveM.mutate(p.id)}
+                                disabled={approveM.isPending || rejectM.isPending}
+                              >
+                                Approve
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => rejectM.mutate(p.id)}
+                                disabled={approveM.isPending || rejectM.isPending}
+                              >
+                                Reject
+                              </Button>
+                            </>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="divide-y divide-white/10">
+
+                <div className="space-y-3 md:hidden">
                   {q.data.map((p) => (
-                    <div key={p.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
-                      <div className="col-span-4 min-w-0">
-                        <div className="truncate font-semibold text-white/85">{p.userEmail || p.userId}</div>
-                        <div className="mt-1 truncate text-xs text-white/55">{p.userFullName ?? '—'}</div>
-                      </div>
-                      <div className="col-span-2">
+                    <div key={p.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+                      <div className="break-words font-semibold text-white/85">{p.userEmail || p.userId}</div>
+                      <div className="mt-1 text-sm text-white/55">{p.userFullName ?? '—'}</div>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
                         <Badge tone="neutral">{String(p.method).toUpperCase()}</Badge>
-                      </div>
-                      <div className="col-span-2 text-white/80">{formatUsd(p.amountUsd)}</div>
-                      <div className="col-span-2">
+                        <span className="font-semibold text-white/85">{formatUsd(p.amountUsd)}</span>
                         <Badge
                           tone={p.status === 'approved' ? 'success' : p.status === 'rejected' ? 'danger' : 'warning'}
                         >
                           {String(p.status).toUpperCase()}
                         </Badge>
                       </div>
-                      <div className="col-span-2 flex justify-end gap-2">
+                      <div className="mt-4 flex flex-col gap-2">
                         {p.storagePath ? (
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="w-full"
                             onClick={() =>
                               viewProof(p.storagePath!).catch((err) => {
                                 const msg = err instanceof Error ? err.message : 'Unable to preview'
@@ -154,14 +211,15 @@ export function AdminProofsPage() {
                               })
                             }
                           >
-                            View
+                            View proof
                           </Button>
                         ) : null}
                         {p.status === 'pending' ? (
-                          <>
+                          <div className="flex gap-2">
                             <Button
                               variant="secondary"
                               size="sm"
+                              className="flex-1"
                               onClick={() => approveM.mutate(p.id)}
                               disabled={approveM.isPending || rejectM.isPending}
                             >
@@ -170,18 +228,19 @@ export function AdminProofsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              className="flex-1"
                               onClick={() => rejectM.mutate(p.id)}
                               disabled={approveM.isPending || rejectM.isPending}
                             >
                               Reject
                             </Button>
-                          </>
+                          </div>
                         ) : null}
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </>
             ) : (
               <div className="text-sm text-white/65">No proofs found for this filter.</div>
             )}

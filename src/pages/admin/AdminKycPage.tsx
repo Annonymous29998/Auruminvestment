@@ -89,16 +89,17 @@ export function AdminKycPage() {
         <div className="space-y-4">
           {grouped.map((u) => (
             <Card key={u.userId} className="ring-1 ring-white/10">
-              <CardHeader className="flex-row items-center justify-between pb-0">
+              <CardHeader className="flex flex-col gap-3 pb-0 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
-                  <CardTitle className="truncate text-base">{u.email}</CardTitle>
-                  <div className="mt-1 truncate text-sm text-white/65">{u.fullName ?? '—'}</div>
+                  <CardTitle className="break-words text-base">{u.email}</CardTitle>
+                  <div className="mt-1 text-sm text-white/65">{u.fullName ?? '—'}</div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                   <Badge tone="warning">{u.docs.length}</Badge>
                   <Button
                     variant="secondary"
                     size="sm"
+                    className="flex-1 sm:flex-none"
                     onClick={() => setStatusM.mutate({ userId: u.userId, status: 'approved' })}
                     disabled={setStatusM.isPending}
                   >
@@ -107,6 +108,7 @@ export function AdminKycPage() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    className="flex-1 sm:flex-none"
                     onClick={() => setStatusM.mutate({ userId: u.userId, status: 'rejected' })}
                     disabled={setStatusM.isPending}
                   >

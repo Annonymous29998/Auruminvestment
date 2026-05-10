@@ -30,38 +30,61 @@ export function TransactionsPage() {
           description="Please refresh the page."
         />
       ) : q.data?.length ? (
-        <div className="overflow-hidden rounded-3xl aurum-glass ring-1 ring-white/10">
-          <div className="grid grid-cols-12 gap-3 border-b border-white/10 px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white/55">
-            <div className="col-span-4">Type</div>
-            <div className="col-span-3">Amount</div>
-            <div className="col-span-3">Status</div>
-            <div className="col-span-2 text-right">Date</div>
+        <>
+          <div className="hidden overflow-hidden rounded-3xl aurum-glass ring-1 ring-white/10 md:block">
+            <div className="grid grid-cols-12 gap-3 border-b border-white/10 px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white/55">
+              <div className="col-span-4">Type</div>
+              <div className="col-span-3">Amount</div>
+              <div className="col-span-3">Status</div>
+              <div className="col-span-2 text-right">Date</div>
+            </div>
+            <div className="divide-y divide-white/10">
+              {q.data.map((t) => (
+                <div key={t.id} className="grid grid-cols-12 gap-3 px-6 py-4 text-sm">
+                  <div className="col-span-4 font-semibold text-white/85">{t.type.toUpperCase()}</div>
+                  <div className="col-span-3 text-white/80">{formatUsd(t.amountUsd)}</div>
+                  <div className="col-span-3">
+                    <Badge
+                      tone={
+                        t.status === 'confirmed'
+                          ? 'success'
+                          : t.status === 'pending'
+                            ? 'warning'
+                            : 'danger'
+                      }
+                    >
+                      {t.status.toUpperCase()}
+                    </Badge>
+                  </div>
+                  <div className="col-span-2 text-right text-white/60">
+                    {new Date(t.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-white/10">
+          <div className="space-y-3 md:hidden">
             {q.data.map((t) => (
-              <div key={t.id} className="grid grid-cols-12 gap-3 px-6 py-4 text-sm">
-                <div className="col-span-4 font-semibold text-white/85">{t.type.toUpperCase()}</div>
-                <div className="col-span-3 text-white/80">{formatUsd(t.amountUsd)}</div>
-                <div className="col-span-3">
+              <div key={t.id} className="rounded-2xl aurum-glass px-4 py-4 ring-1 ring-white/10">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-semibold text-white/85">{t.type.toUpperCase()}</span>
                   <Badge
                     tone={
-                      t.status === 'confirmed'
-                        ? 'success'
-                        : t.status === 'pending'
-                          ? 'warning'
-                          : 'danger'
+                      t.status === 'confirmed' ? 'success' : t.status === 'pending' ? 'warning' : 'danger'
                     }
                   >
                     {t.status.toUpperCase()}
                   </Badge>
                 </div>
-                <div className="col-span-2 text-right text-white/60">
-                  {new Date(t.createdAt).toLocaleDateString()}
+                <div className="mt-3 flex items-baseline justify-between gap-2 text-sm">
+                  <span className="text-white/55">Amount</span>
+                  <span className="font-semibold text-white/90">{formatUsd(t.amountUsd)}</span>
                 </div>
+                <div className="mt-2 text-xs text-white/50">{new Date(t.createdAt).toLocaleString()}</div>
               </div>
             ))}
           </div>
-        </div>
+        </>
       ) : (
         <EmptyState
           icon={<CreditCard className="h-5 w-5 text-gold" />}

@@ -74,12 +74,14 @@ export function AdminWithdrawalsPage() {
         />
       ) : (
         <Card className="ring-1 ring-white/10">
-          <CardHeader className="flex-row items-center justify-between pb-0">
-            <div>
+          <CardHeader className="flex flex-col gap-2 pb-0 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <CardTitle className="text-base">Pending withdrawal requests</CardTitle>
               <div className="mt-1 text-sm text-white/65">Amount is deducted from the user balance only when you approve.</div>
             </div>
-            <Badge tone="warning">{q.data?.length ?? 0}</Badge>
+            <Badge tone="warning" className="w-fit">
+              {q.data?.length ?? 0}
+            </Badge>
           </CardHeader>
           <CardContent className="pt-6">
             {q.isLoading ? (
@@ -93,33 +95,66 @@ export function AdminWithdrawalsPage() {
                 description={q.error instanceof Error ? q.error.message : 'Check your admin access policies.'}
               />
             ) : q.data?.length ? (
-              <div className="overflow-hidden rounded-2xl ring-1 ring-white/10">
-                <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
-                  <div className="col-span-3">User</div>
-                  <div className="col-span-2">Amount</div>
-                  <div className="col-span-4">Destination</div>
-                  <div className="col-span-3 text-right">Action</div>
-                </div>
-                <div className="divide-y divide-white/10">
-                  {q.data.map((w) => (
-                    <div key={w.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
-                      <div className="col-span-3 min-w-0">
-                        <div className="truncate font-semibold text-white/85">{w.userEmail || w.userId}</div>
-                        <div className="mt-1 truncate text-xs text-white/55">{w.userFullName ?? '—'}</div>
-                      </div>
-                      <div className="col-span-2 text-white/80">{formatUsd(w.amountUsd)}</div>
-                      <div className="col-span-4 min-w-0">
-                        <div
-                          className="line-clamp-4 whitespace-pre-line wrap-break-word text-xs text-white/70"
-                          title={formatWithdrawalDestinationDisplay(w.destination)}
-                        >
-                          {formatWithdrawalDestinationDisplay(w.destination)}
+              <>
+                <div className="hidden overflow-hidden rounded-2xl ring-1 ring-white/10 md:block">
+                  <div className="grid grid-cols-12 gap-3 border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+                    <div className="col-span-3">User</div>
+                    <div className="col-span-2">Amount</div>
+                    <div className="col-span-4">Destination</div>
+                    <div className="col-span-3 text-right">Action</div>
+                  </div>
+                  <div className="divide-y divide-white/10">
+                    {q.data.map((w) => (
+                      <div key={w.id} className="grid grid-cols-12 gap-3 px-4 py-3 text-sm">
+                        <div className="col-span-3 min-w-0">
+                          <div className="truncate font-semibold text-white/85">{w.userEmail || w.userId}</div>
+                          <div className="mt-1 truncate text-xs text-white/55">{w.userFullName ?? '—'}</div>
+                        </div>
+                        <div className="col-span-2 text-white/80">{formatUsd(w.amountUsd)}</div>
+                        <div className="col-span-4 min-w-0">
+                          <div
+                            className="line-clamp-4 whitespace-pre-line wrap-break-word text-xs text-white/70"
+                            title={formatWithdrawalDestinationDisplay(w.destination)}
+                          >
+                            {formatWithdrawalDestinationDisplay(w.destination)}
+                          </div>
+                        </div>
+                        <div className="col-span-3 flex justify-end gap-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => approveM.mutate(w.id)}
+                            disabled={approveM.isPending || rejectM.isPending}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => rejectM.mutate(w.id)}
+                            disabled={approveM.isPending || rejectM.isPending}
+                          >
+                            Reject
+                          </Button>
                         </div>
                       </div>
-                      <div className="col-span-3 flex justify-end gap-2">
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-3 md:hidden">
+                  {q.data.map((w) => (
+                    <div key={w.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+                      <div className="break-words font-semibold text-white/85">{w.userEmail || w.userId}</div>
+                      <div className="mt-1 text-sm text-white/55">{w.userFullName ?? '—'}</div>
+                      <div className="mt-3 text-lg font-semibold text-white/90">{formatUsd(w.amountUsd)}</div>
+                      <div className="mt-3 rounded-xl bg-black/20 p-3 text-xs leading-relaxed text-white/70">
+                        {formatWithdrawalDestinationDisplay(w.destination)}
+                      </div>
+                      <div className="mt-4 flex gap-2">
                         <Button
                           variant="secondary"
                           size="sm"
+                          className="flex-1"
                           onClick={() => approveM.mutate(w.id)}
                           disabled={approveM.isPending || rejectM.isPending}
                         >
@@ -128,6 +163,7 @@ export function AdminWithdrawalsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          className="flex-1"
                           onClick={() => rejectM.mutate(w.id)}
                           disabled={approveM.isPending || rejectM.isPending}
                         >
@@ -137,7 +173,7 @@ export function AdminWithdrawalsPage() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </>
             ) : (
               <div className="text-sm text-white/65">No pending withdrawal requests.</div>
             )}
