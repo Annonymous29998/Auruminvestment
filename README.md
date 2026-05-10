@@ -57,6 +57,20 @@ Set these for **Production** (and **Preview** if you want PR previews to talk to
 
 **Do not** set `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_EMAIL`, or `ADMIN_PASSWORD` on Vercel for this static app unless you add a **server-only** API — they are for local `npm run seed:admin` only and would be a security risk in the browser.
 
+### How you log into the admin console (production)
+
+The admin UI uses **normal Supabase Auth** (email + password), the same mechanism as investors. You do **not** put the service role on Vercel for that.
+
+1. **Create an admin account once** (pick one approach):
+   - **Local seed (recommended):** On your machine, put `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in `.env` (never commit `.env`). Run `npm run seed:admin`. That creates the Auth user and sets `public.users.role` to `admin`.
+   - **Or manually:** In Supabase Dashboard → **Authentication** → create a user (or invite), then in **Table Editor** → `users` set `role` to `admin` for that user’s row (and ensure the row exists / matches `auth.users` id).
+
+2. **Deploy** with only `VITE_*` variables on Vercel (including `VITE_ADMIN_EMAILS` if you want to restrict which emails may use `/admin/login`).
+
+3. **Sign in** at `https://auruminvestment.online/admin/login` using that user’s **email and password** — the same credentials the seed script used, or the ones you set in the Dashboard.
+
+The service role exists only to let the **seed script** call Admin APIs (`auth.admin.createUser`, etc.) from your laptop. Day-to-day admin login is the **anon key** + **your admin user’s password** in the browser.
+
 After connecting **auruminvestment.online** in Vercel → Domains, redeploy so the live URL matches what you configured in Supabase.
 
 ## Payment confirmation flow (important)
