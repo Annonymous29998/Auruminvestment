@@ -51,7 +51,7 @@ export function HomePage() {
               transition={{ duration: 0.26, delay: 0.15 }}
               className="mx-auto mt-7 flex max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center"
             >
-              <Link to="/#how-it-works" className="w-full sm:w-auto">
+              <Link to="/auth/login" className="w-full sm:w-auto">
                 <Button variant="primary" size="lg" className="w-full sm:w-auto">
                   Start Investing <ArrowRight className="h-4 w-4" />
                 </Button>
