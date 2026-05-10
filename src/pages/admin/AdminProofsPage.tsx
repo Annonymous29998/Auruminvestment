@@ -187,7 +187,7 @@ export function AdminProofsPage() {
                 <div className="space-y-3 md:hidden">
                   {q.data.map((p) => (
                     <div key={p.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                      <div className="break-words font-semibold text-white/85">{p.userEmail || p.userId}</div>
+                      <div className="wrap-break-word font-semibold text-white/85">{p.userEmail || p.userId}</div>
                       <div className="mt-1 text-sm text-white/55">{p.userFullName ?? '—'}</div>
                       <div className="mt-3 flex flex-wrap items-center gap-2">
                         <Badge tone="neutral">{String(p.method).toUpperCase()}</Badge>

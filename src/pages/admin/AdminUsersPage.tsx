@@ -151,7 +151,7 @@ export function AdminUsersPage() {
               const canDelete = u.role !== 'admin' && u.id !== currentUser?.id
               return (
                 <div key={u.id} className="rounded-2xl aurum-glass px-4 py-4 ring-1 ring-white/10">
-                  <div className="min-w-0 break-words">
+                  <div className="min-w-0 wrap-break-word">
                     <div className="font-semibold text-white/85">{u.email}</div>
                     <div className="mt-1 text-sm text-white/55">{u.fullName ?? '—'}</div>
                   </div>

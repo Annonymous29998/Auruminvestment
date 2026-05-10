@@ -144,7 +144,7 @@ export function AdminWithdrawalsPage() {
                 <div className="space-y-3 md:hidden">
                   {q.data.map((w) => (
                     <div key={w.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                      <div className="break-words font-semibold text-white/85">{w.userEmail || w.userId}</div>
+                      <div className="wrap-break-word font-semibold text-white/85">{w.userEmail || w.userId}</div>
                       <div className="mt-1 text-sm text-white/55">{w.userFullName ?? '—'}</div>
                       <div className="mt-3 text-lg font-semibold text-white/90">{formatUsd(w.amountUsd)}</div>
                       <div className="mt-3 rounded-xl bg-black/20 p-3 text-xs leading-relaxed text-white/70">

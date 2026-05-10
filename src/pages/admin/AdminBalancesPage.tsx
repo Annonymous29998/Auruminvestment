@@ -215,7 +215,7 @@ export function AdminBalancesPage() {
                 const d = draftFor(u.id)
                 return (
                   <div key={u.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                    <div className="break-words font-medium text-white/90">{u.email}</div>
+                    <div className="wrap-break-word font-medium text-white/90">{u.email}</div>
                     <div className="mt-1 text-xs text-white/55">{u.fullName ?? '—'}</div>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <Badge tone={u.role === 'admin' ? 'warning' : 'neutral'}>{u.role.toUpperCase()}</Badge>

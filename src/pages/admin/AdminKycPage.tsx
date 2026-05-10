@@ -91,7 +91,7 @@ export function AdminKycPage() {
             <Card key={u.userId} className="ring-1 ring-white/10">
               <CardHeader className="flex flex-col gap-3 pb-0 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
-                  <CardTitle className="break-words text-base">{u.email}</CardTitle>
+                  <CardTitle className="wrap-break-word text-base">{u.email}</CardTitle>
                   <div className="mt-1 text-sm text-white/65">{u.fullName ?? '—'}</div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 sm:justify-end">

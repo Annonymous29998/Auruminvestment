@@ -175,7 +175,7 @@ export function AdminApprovalsPage() {
                   <div className="space-y-3 md:hidden">
                     {invQ.data.map((inv) => (
                       <div key={inv.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                        <div className="break-words font-semibold text-white/85">{inv.userEmail || inv.userId}</div>
+                        <div className="wrap-break-word font-semibold text-white/85">{inv.userEmail || inv.userId}</div>
                         <div className="mt-1 text-sm text-white/55">{inv.userFullName ?? '—'}</div>
                         <dl className="mt-3 grid gap-2 text-sm">
                           <div className="flex justify-between gap-3">
@@ -283,7 +283,7 @@ export function AdminApprovalsPage() {
                   <div className="space-y-3 md:hidden">
                     {proofsQ.data.map((p) => (
                       <div key={p.id} className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-                        <div className="break-words font-semibold text-white/85">{p.userEmail || p.userId}</div>
+                        <div className="wrap-break-word font-semibold text-white/85">{p.userEmail || p.userId}</div>
                         <div className="mt-1 text-sm text-white/55">{p.userFullName ?? '—'}</div>
                         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                           <Badge tone="neutral">{String(p.method).toUpperCase()}</Badge>
