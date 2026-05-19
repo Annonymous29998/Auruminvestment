@@ -55,7 +55,7 @@ export function AdminUsersPage() {
     <div>
       <PageHeader
         title="Users"
-        subtitle="Delete permanently removes the account and related records. You cannot delete yourself or other administrators. If removal fails, your developer may need to update server-side permissions."
+        subtitle="If you delete a user, their account and related records are removed permanently. You cannot delete administrator accounts."
       />
 
       <ConfirmDialog
