@@ -43,10 +43,7 @@ using (
   bucket_id in ('kyc-documents', 'payment-proofs')
   and (
     split_part(name, '/', 1) = auth.uid()::text
-    or exists (
-      select 1 from public.users u
-      where u.id = auth.uid() and u.role = 'admin'
-    )
+    or public.is_admin()
   )
 );
 

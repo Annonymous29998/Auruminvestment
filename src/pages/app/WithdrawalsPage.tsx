@@ -97,7 +97,7 @@ export function WithdrawalsPage() {
       return
     }
 
-    let destinationJson = ''
+    let destinationJson: string
     if (method === 'bank_us') {
       const holder = accountHolderName.trim()
       const bank = bankName.trim()

@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { ShieldCheck } from 'lucide-react'
+import { StorageFilePreviewModal, type StorageFilePreviewTarget } from '@/components/admin/StorageFilePreviewModal'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -22,6 +24,7 @@ import { useToastStore } from '@/stores/toastStore'
 export function AdminApprovalsPage() {
   const toast = useToastStore((s) => s.push)
   const qc = useQueryClient()
+  const [preview, setPreview] = useState<StorageFilePreviewTarget | null>(null)
 
   const invQ = useQuery({
     queryKey: ['admin', 'pending-investments'],
@@ -96,12 +99,28 @@ export function AdminApprovalsPage() {
     },
   })
 
+  function openProofPreview(p: {
+    storagePath: string
+    userEmail: string
+    method: string
+    amountUsd: number
+  }) {
+    setPreview({
+      bucket: 'payment-proofs',
+      path: p.storagePath,
+      title: 'Payment proof',
+      subtitle: `${p.userEmail} · ${String(p.method).toUpperCase()} · ${formatUsd(p.amountUsd)}`,
+    })
+  }
+
   return (
     <div>
       <PageHeader
         title="Approvals"
         subtitle="Approve investments and deposits after compliance review."
       />
+
+      <StorageFilePreviewModal target={preview} onClose={() => setPreview(null)} />
 
       {!isSupabaseConfigured ? (
         <EmptyState
@@ -258,7 +277,23 @@ export function AdminApprovalsPage() {
                             <Badge tone="neutral">{String(p.method).toUpperCase()}</Badge>
                           </div>
                           <div className="col-span-2 text-white/80">{formatUsd(p.amountUsd)}</div>
-                          <div className="col-span-2 flex justify-end gap-2">
+                          <div className="col-span-2 flex flex-wrap justify-end gap-2">
+                            {p.storagePath ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  openProofPreview({
+                                    storagePath: p.storagePath!,
+                                    userEmail: p.userEmail || p.userId,
+                                    method: String(p.method),
+                                    amountUsd: p.amountUsd,
+                                  })
+                                }
+                              >
+                                View
+                              </Button>
+                            ) : null}
                             <Button
                               variant="secondary"
                               size="sm"
@@ -289,25 +324,44 @@ export function AdminApprovalsPage() {
                           <Badge tone="neutral">{String(p.method).toUpperCase()}</Badge>
                           <span className="font-semibold text-white/85">{formatUsd(p.amountUsd)}</span>
                         </div>
-                        <div className="mt-4 flex gap-2">
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className="flex-1"
-                            onClick={() => approveProofM.mutate(p.id)}
-                            disabled={approveProofM.isPending || rejectProofM.isPending}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="flex-1"
-                            onClick={() => rejectProofM.mutate(p.id)}
-                            disabled={approveProofM.isPending || rejectProofM.isPending}
-                          >
-                            Reject
-                          </Button>
+                        <div className="mt-4 flex flex-col gap-2">
+                          {p.storagePath ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full"
+                              onClick={() =>
+                                openProofPreview({
+                                  storagePath: p.storagePath!,
+                                  userEmail: p.userEmail || p.userId,
+                                  method: String(p.method),
+                                  amountUsd: p.amountUsd,
+                                })
+                              }
+                            >
+                              View proof
+                            </Button>
+                          ) : null}
+                          <div className="flex gap-2">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => approveProofM.mutate(p.id)}
+                              disabled={approveProofM.isPending || rejectProofM.isPending}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => rejectProofM.mutate(p.id)}
+                              disabled={approveProofM.isPending || rejectProofM.isPending}
+                            >
+                              Reject
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}

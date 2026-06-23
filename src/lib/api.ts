@@ -804,14 +804,17 @@ export type AdminPendingKycItem = KycDocument & {
   userFullName: string | null
 }
 
-export async function adminListPendingKycDocuments(): Promise<AdminPendingKycItem[]> {
+export async function adminListKycDocuments(args?: {
+  status?: 'pending' | 'approved' | 'rejected'
+}): Promise<AdminPendingKycItem[]> {
   const supabase = assertSupabase()
-  const { data, error } = await supabase
+  let query = supabase
     .from('kyc_documents')
     .select('id,user_id,document_type,storage_path,status,created_at,users(email,full_name)')
-    .eq('status', 'pending')
     .order('created_at', { ascending: false })
     .limit(300)
+  if (args?.status) query = query.eq('status', args.status)
+  const { data, error } = await query
   if (error) throw error
   return (data ?? []).map((d) => ({
     id: d.id,
@@ -823,6 +826,11 @@ export async function adminListPendingKycDocuments(): Promise<AdminPendingKycIte
     userEmail: getNestedString(d.users as unknown, 'email') ?? '',
     userFullName: getNestedString(d.users as unknown, 'full_name'),
   }))
+}
+
+/** @deprecated Use adminListKycDocuments({ status: 'pending' }) */
+export async function adminListPendingKycDocuments(): Promise<AdminPendingKycItem[]> {
+  return adminListKycDocuments({ status: 'pending' })
 }
 
 export async function adminSetUserKycStatus(args: { userId: string; status: 'approved' | 'rejected' }): Promise<void> {

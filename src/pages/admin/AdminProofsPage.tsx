@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CreditCard } from 'lucide-react'
+import { StorageFilePreviewModal, type StorageFilePreviewTarget } from '@/components/admin/StorageFilePreviewModal'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -11,13 +12,13 @@ import { formatUsd } from '@/features/investments/calculator'
 import { adminApprovePaymentProof, adminListPaymentProofs, adminRejectPaymentProof } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/env'
 import { uiCopy } from '@/lib/uiCopy'
-import { getSupabase } from '@/lib/supabaseClient'
 import { useToastStore } from '@/stores/toastStore'
 
 export function AdminProofsPage() {
   const toast = useToastStore((s) => s.push)
   const qc = useQueryClient()
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending')
+  const [preview, setPreview] = useState<StorageFilePreviewTarget | null>(null)
 
   const status = useMemo(() => (filter === 'all' ? undefined : filter), [filter])
   const q = useQuery({
@@ -59,12 +60,13 @@ export function AdminProofsPage() {
     },
   })
 
-  async function viewProof(storagePath: string) {
-    const supabase = getSupabase()
-    const { data, error } = await supabase.storage.from('payment-proofs').createSignedUrl(storagePath, 120)
-    if (error) throw error
-    if (!data?.signedUrl) throw new Error('Unable to generate preview link.')
-    window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
+  function openPreview(p: { storagePath: string; userEmail: string; method: string; amountUsd: number }) {
+    setPreview({
+      bucket: 'payment-proofs',
+      path: p.storagePath,
+      title: 'Payment proof',
+      subtitle: `${p.userEmail} · ${String(p.method).toUpperCase()} · ${formatUsd(p.amountUsd)}`,
+    })
   }
 
   return (
@@ -73,6 +75,8 @@ export function AdminProofsPage() {
         title="Payment Proofs"
         subtitle="Review uploaded proofs and confirm deposits."
       />
+
+      <StorageFilePreviewModal target={preview} onClose={() => setPreview(null)} />
 
       {!isSupabaseConfigured ? (
         <EmptyState
@@ -149,9 +153,11 @@ export function AdminProofsPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() =>
-                                viewProof(p.storagePath!).catch((err) => {
-                                  const msg = err instanceof Error ? err.message : 'Unable to preview'
-                                  toast({ tone: 'danger', title: 'Preview failed', message: msg })
+                                openPreview({
+                                  storagePath: p.storagePath!,
+                                  userEmail: p.userEmail || p.userId,
+                                  method: String(p.method),
+                                  amountUsd: p.amountUsd,
                                 })
                               }
                             >
@@ -205,9 +211,11 @@ export function AdminProofsPage() {
                             size="sm"
                             className="w-full"
                             onClick={() =>
-                              viewProof(p.storagePath!).catch((err) => {
-                                const msg = err instanceof Error ? err.message : 'Unable to preview'
-                                toast({ tone: 'danger', title: 'Preview failed', message: msg })
+                              openPreview({
+                                storagePath: p.storagePath!,
+                                userEmail: p.userEmail || p.userId,
+                                method: String(p.method),
+                                amountUsd: p.amountUsd,
                               })
                             }
                           >
