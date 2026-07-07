@@ -17,7 +17,7 @@ export function ForgotPasswordPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      await requestPasswordReset(email)
+      await requestPasswordReset(email.trim())
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unable to request reset'
       toast({ tone: 'danger', title: 'Request failed', message })

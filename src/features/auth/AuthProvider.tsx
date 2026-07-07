@@ -11,6 +11,8 @@ type AuthContextValue = {
   user: AppUser | null
   session: Session | null
   loading: boolean
+  /** True after the user opens a password-reset link from email. */
+  passwordRecoveryActive: boolean
   /** Refetch role / KYC / name from public.users (e.g. after admin updates your profile). */
   refreshProfile: () => Promise<void>
   signUp: (args: { email: string; password: string; fullName?: string }) => Promise<{ hasSession: boolean }>
@@ -68,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<AppUser | null>(null)
   const [loading, setLoading] = useState(() => isSupabaseConfigured)
+  const [passwordRecoveryActive, setPasswordRecoveryActive] = useState(false)
 
   const refreshProfile = useCallback(async () => {
     const uid = session?.user?.id
@@ -155,6 +158,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // INITIAL_SESSION is delivered async; React Strict Mode can unsubscribe before it runs,
       // so the callback never fires. `getSession()` below always awaits full client init + storage.
       if (event === 'INITIAL_SESSION') return
+      if (event === 'PASSWORD_RECOVERY') setPasswordRecoveryActive(true)
+      if (event === 'SIGNED_OUT') setPasswordRecoveryActive(false)
       void applyAuthEvent(event, session)
     })
 
@@ -185,6 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       session,
       loading,
+      passwordRecoveryActive,
       refreshProfile,
       signUp: async ({ email, password, fullName }) => {
         if (!isSupabaseConfigured) throw new Error(ERR_BACKEND_NOT_CONFIGURED)
@@ -277,6 +283,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const supabase = getSupabase()
         setSession(null)
         setUser(null)
+        setPasswordRecoveryActive(false)
         try {
           const { error } = await supabase.auth.signOut({ scope: 'local' })
           if (error) throw error
@@ -288,7 +295,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       requestPasswordReset: async (email) => {
         if (!isSupabaseConfigured) throw new Error(ERR_BACKEND_NOT_CONFIGURED)
         const supabase = getSupabase()
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
           redirectTo: `${window.location.origin}/auth/reset-password`,
         })
         if (error) throw error
@@ -299,10 +306,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const supabase = getSupabase()
         const { error } = await supabase.auth.updateUser({ password: newPassword })
         if (error) throw error
+        setPasswordRecoveryActive(false)
         toast({ tone: 'success', title: 'Password updated' })
       },
     }),
-    [loading, refreshProfile, session, toast, user],
+    [loading, passwordRecoveryActive, refreshProfile, session, toast, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -37,6 +37,14 @@ npm run dev
 
 Password reset uses `https://<your-origin>/auth/reset-password`, so the production origin must appear in the redirect allow list (the `/**` entries cover it).
 
+**If users say reset email “does not work”:**
+
+1. **Supabase → Authentication → URL Configuration** — confirm **Site URL** is `https://auruminvestment.online` (not `localhost` or an old Vercel URL).
+2. **Redirect URLs** must include `https://auruminvestment.online/**` (and `http://localhost:5173/**` for local testing).
+3. **Supabase → Authentication → Email** — enable custom SMTP if the default mail is blocked or rate-limited; check spam/junk folders.
+4. Users must open the **latest** email link (old links expire). After clicking the link they should land on `/auth/reset-password` before choosing a new password.
+5. In **Authentication → Email templates → Reset password**, the link should use the default `{{ .ConfirmationURL }}` (do not hard-code `localhost`).
+
 ### Vercel → Environment Variables
 
 Set these for **Production** (and **Preview** if you want PR previews to talk to Supabase). Only `VITE_*` values are embedded in the client build.

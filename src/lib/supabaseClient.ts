@@ -55,11 +55,18 @@ export function getSupabase(): SupabaseClient {
         // recovering the session from localStorage on normal pages (e.g. /app) if the hash
         // ever looks auth-like. Only treat known auth routes as URL-based sessions.
         detectSessionInUrl: (url, params) => {
-          if (params.access_token || params.error_description) {
-            const p = url.pathname
-            return p === '/' || p.startsWith('/auth/') || p.startsWith('/app') || p.startsWith('/admin')
-          }
-          return false
+          const p = url.pathname
+          const hasAuthParams = Boolean(
+            params.access_token ||
+              params.code ||
+              params.error ||
+              params.error_description ||
+              params.error_code,
+          )
+          if (!hasAuthParams) return false
+          // Always process recovery / verify links on dedicated auth routes.
+          if (p === '/auth/reset-password' || p === '/auth/verify-email') return true
+          return p === '/' || p.startsWith('/auth/') || p.startsWith('/app') || p.startsWith('/admin')
         },
         storageKey: `sb-${ref}-app`,
         storage: typeof window !== 'undefined' ? window.localStorage : undefined,
